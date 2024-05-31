@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Roboto+Mono&display=swap');
+
+* {
+  font-family: "Roboto Mono";
+  margin: 0px;
+}
+
+.layout {
+  display: grid;
+  height: 100vh;
+  grid:
+    "header" auto
+    "main" 1fr
+    "footer" auto
+    / 1fr;
+  gap: 8px;
+}
+
+.header {
+  grid-area: header;
+}
+
+.main {
+  grid-area: main;
+}
+
+.footer {
+  grid-area: footer;
+}
+
+.content {
+  min-width: 400px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: wrap;
+}
+
+.typing-field {
+  display: inline;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.char-object {
+  display: inline;
+  margin-right: 2px;
+}

@@ -1,0 +1,43 @@
+.header {
+  width: 100%;
+  position: static;
+  margin-top: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav-container {
+  min-width: 400px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-container a {
+  text-decoration: none;
+  color: white;
+}
+
+.nav-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 2.5rem;
+  padding-left: 15px;
+  padding-right: 25px;
+  text-decoration: none;
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+  text-decoration: none;
+  padding-left: 25px;
+  padding-right: 25px;
+}
