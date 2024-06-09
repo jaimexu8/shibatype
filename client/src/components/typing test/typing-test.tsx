@@ -9,14 +9,17 @@ interface charObjects {
   correct: boolean;
 }
 
+interface User {
+  uid: string;
+  email: string;
+  displayName: string;
+}
+
 interface RootState {
-  uid: {
-    value: string;
-  };
+  user: User;
 }
 
 function TypingTest() {
-  const uid = useSelector((state: RootState) => state.uid.value);
   const [paragraph, setParagraph] = useState(
     "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. Suspendisse potenti. Sed lectus."
   );
@@ -36,6 +39,8 @@ function TypingTest() {
   const [charMistakes, setCharMistakes] = useState(0);
   const [charAccuracy, setCharAccuracy] = useState(0);
 
+  const uid = useSelector((state: RootState) => state.user.uid);
+
   useEffect(() => {
     async function fetchQuote() {
       // Fetch a random quote from the Quotable API
@@ -44,7 +49,6 @@ function TypingTest() {
       );
       const data = await response.json();
       if (response.ok) {
-        console.log("Quote fetched: ", data.content);
         setParagraph(data.content);
       } else {
         console.log("Quote unable to be fetched", data.content);

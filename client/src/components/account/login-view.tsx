@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import Container from "@mui/material/Container";
 import { useDispatch } from "react-redux";
-import { login } from "../../app/uidSlice";
+import { setUser } from "../../app/userSlice";
 import { auth } from "../../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
@@ -26,15 +26,21 @@ export default function LoginView({ setViewSignup }: LoginViewProps) {
 
   const signIn = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      dispatch(login(userCredential.user.uid));
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      if (user) {
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          })
+        );
+      }
+      console.log("User: ", user);
     } catch (e) {
+      console.error(e);
       if (e instanceof FirebaseError) {
-        setError(e.message);
+        setError("Invalid email or password");
       }
     }
   };
@@ -111,7 +117,7 @@ export default function LoginView({ setViewSignup }: LoginViewProps) {
             </Grid>
           </Grid>
         </Box>
-        <Typography variant="body2" color="error">
+        <Typography variant="body2" color="error" sx={{ margin: "20px" }}>
           {error}
         </Typography>
       </Box>
