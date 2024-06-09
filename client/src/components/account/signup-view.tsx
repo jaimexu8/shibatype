@@ -9,9 +9,9 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { login } from "../../app/uidSlice";
+import { setUser } from "../../app/userSlice";
 import { auth } from "../../config/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 interface SignupViewProps {
   setViewSignup: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,20 +25,20 @@ export default function SignupView({ setViewSignup }: SignupViewProps) {
 
   const signUp = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
+      const { user } = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      console.log("User created");
-      // Set current uid in Redux store
-      dispatch(login(userCredential.user.uid));
-      // Create user in MongoDB
-      const response = await axios.post("/api/users", {
-        firebaseUid: userCredential.user.uid,
-        username: username,
-      });
-      console.log(response.data);
+      if (user) {
+        await updateProfile(user, { displayName: username });
+        dispatch(setUser(user));
+        const response = await axios.post("/api/users", {
+          firebaseUid: user.uid,
+          displayName: user.displayName,
+        });
+        console.log(response.data);
+      }
     } catch (e) {
       console.error(e);
     }

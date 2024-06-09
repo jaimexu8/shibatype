@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import uidSlice from "./uidSlice";
+import userReducer from "./userSlice";
 import themeSlice from "./themeSlice";
 
 const store = configureStore({
   reducer: {
-    uid: uidSlice,
+    user: userReducer,
     theme: themeSlice,
   },
 });
