@@ -1,5 +1,5 @@
-import Header from "../components/header.js";
-import Footer from "../components/footer.jsx";
+import Header from "../components/header/header.js";
+import Footer from "../components/footer/footer.js";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import "../styles/base.css";

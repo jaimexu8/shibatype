@@ -1,5 +1,5 @@
-import Header from "../components/header.js";
-import Footer from "../components/footer.jsx";
+import Header from "../components/header/header.js";
+import Footer from "../components/footer/footer.js";
 import TypingTest from "../components/typing test/typing-test.tsx";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store.ts";

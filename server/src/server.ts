@@ -1,34 +1,24 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import TestModel from "./models/Test";
 import UserModel from "./models/User";
+import { validateUser } from "./middlewares/user.middleware";
+import { validateTest } from "./middlewares/test.middleware";
 
 const app = express();
-const port = process.env.PORT || 3001;
 app.use(cors());
-
-// MongoDB connection
+app.use(bodyParser.json());
 dotenv.config();
 mongoose.connect(process.env.URI || "");
-app.use(bodyParser.json());
 
-// Sign up new user
-app.post("/api/users", async (req: Request, res: Response) => {
-  const firebaseUid = req.body.firebaseUid;
-  if (!firebaseUid) {
-    return res.status(400).send({ message: "Firebase UID is required." });
-  }
-  const username = req.body.username;
-  if (!username) {
-    return res.status(400).send({ message: "Username is required." });
-  }
+// Create new user
+app.post("/api/users", validateUser, async (req: Request, res: Response) => {
   try {
     const user = new UserModel({
-      _id: firebaseUid,
-      username: username,
+      ...req.body,
       tests: [],
     });
     await user.save();
@@ -40,16 +30,11 @@ app.post("/api/users", async (req: Request, res: Response) => {
 });
 
 // Upload test results
-app.post("/api/tests", async (req: Request, res: Response) => {
-  const test = req.body;
-  if (!test) {
-    return res.status(400).send({ message: "Test data is required." });
-  }
+app.post("/api/tests", validateTest, async (req: Request, res: Response) => {
   try {
-    const newTest = new TestModel(test);
-    await newTest.save();
-    res.status(201).send(newTest);
-    // TODO: Check if high score
+    const test = new TestModel(req.body);
+    await test.save();
+    res.status(201).send(test);
   } catch (error) {
     res.status(500).send({ message: "Server error." });
   }
@@ -78,6 +63,6 @@ app.post("/api/users/:id/tests", async (req: Request, res: Response) => {
 });
 
 // Server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server running: ${process.env.PORT}`);
 });

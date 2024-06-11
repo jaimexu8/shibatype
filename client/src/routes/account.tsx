@@ -1,8 +1,8 @@
-import Header from "../components/header";
+import Header from "../components/header/header";
 import AccountView from "../components/account/account-view";
 import LoginView from "../components/account/login-view";
 import SignupView from "../components/account/signup-view";
-import Footer from "../components/footer";
+import Footer from "../components/footer/footer";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../app/store";
@@ -21,11 +21,11 @@ export default function Account() {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      dispatch(setUser(user));
+      if (user?.uid) dispatch(setUser(user));
     });
 
     return () => unsubscribe();
-  }, [dispatch]);
+  }, []);
 
   return (
     <div className="layout" id={currentTheme}>

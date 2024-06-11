@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import axios from "axios";
+import api from "../../services/api";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../app/userSlice";
 import { auth } from "../../config/firebase";
@@ -32,12 +32,20 @@ export default function SignupView({ setViewSignup }: SignupViewProps) {
       );
       if (user) {
         await updateProfile(user, { displayName: username });
-        dispatch(setUser(user));
-        const response = await axios.post("/api/users", {
-          firebaseUid: user.uid,
+        const response = await api.post("/api/users", {
+          uid: user.uid,
           displayName: user.displayName,
+          email: user.email,
         });
         console.log(response.data);
+
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          })
+        );
       }
     } catch (e) {
       console.error(e);
