@@ -2,16 +2,12 @@ import mongoose from "mongoose";
 
 const TestSchema = new mongoose.Schema(
   {
-    uid: {
+    firebaseID: {
       type: String,
       required: true,
     },
-    paragraph: {
+    prompt: {
       type: String,
-      required: true,
-    },
-    totalWords: {
-      type: Number,
       required: true,
     },
     wordsTyped: {
@@ -22,23 +18,11 @@ const TestSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    wordAccuracy: {
-      type: Number,
-      required: true,
-    },
-    totalChars: {
-      type: Number,
-      required: true,
-    },
     charsTyped: {
       type: Number,
       required: true,
     },
     charMistakes: {
-      type: Number,
-      required: true,
-    },
-    charAccuracy: {
       type: Number,
       required: true,
     },

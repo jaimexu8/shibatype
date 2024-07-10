@@ -5,9 +5,9 @@ export const validateUser = (
   res: Response,
   next: NextFunction
 ) => {
-  const uid = req.body.uid;
-  if (!uid) {
-    return res.status(400).send({ message: "UID is required." });
+  const firebaseID = req.body.firebaseID;
+  if (!firebaseID) {
+    return res.status(400).send({ message: "Firebase ID is required." });
   }
 
   const displayName = req.body.displayName;
