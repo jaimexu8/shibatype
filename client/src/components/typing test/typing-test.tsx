@@ -20,7 +20,7 @@ interface RootState {
 }
 
 function TypingTest() {
-  const [paragraph, setParagraph] = useState(
+  const [prompt, setPrompt] = useState(
     "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. Suspendisse potenti. Sed lectus."
   );
 
@@ -49,7 +49,7 @@ function TypingTest() {
       );
       const data = await response.json();
       if (response.ok) {
-        setParagraph(data.content);
+        setPrompt(data.content);
       } else {
         console.log("Quote unable to be fetched", data.content);
         // TODO: Create function to call from local database if quote cannot be fetched
@@ -59,7 +59,7 @@ function TypingTest() {
   }, [showResults]);
 
   const [charArray, setCharArray] = useState(
-    paragraph.split("").map((char) => {
+    prompt.split("").map((char) => {
       return {
         character: char,
         correct: false,
@@ -69,12 +69,12 @@ function TypingTest() {
 
   useEffect(() => {
     setCharArray(
-      paragraph.split("").map((char) => ({
+      prompt.split("").map((char) => ({
         character: char,
         correct: false,
       }))
     );
-  }, [paragraph]);
+  }, [prompt]);
 
   const charRegex = (key: string) => {
     return /^[a-zA-Z0-9 ,./?;:'"-_]$/i.test(key);
@@ -86,12 +86,11 @@ function TypingTest() {
       //start(60);
       start();
       setTestRunning(true);
-      console.log("Test running");
     };
 
     const handleTestEnd = async () => {
       updateAccuracy({
-        paragraph,
+        prompt,
         charArray,
         index,
         setTotalWords,
@@ -108,31 +107,22 @@ function TypingTest() {
       setShowResults(true);
 
       // Send test results to server
-      try {
-        const testResponse = await axios.post("/api/tests", {
-          uid,
-          paragraph,
-          totalWords,
-          wordsTyped,
-          wordMistakes,
-          wordAccuracy,
-          totalChars,
-          charsTyped,
-          charMistakes,
-          charAccuracy,
-          seconds,
-        });
-        console.log(testResponse);
-        if (testResponse.status >= 200 && testResponse.status < 300) {
-          // Add test results to user
-          const testId = testResponse.data.testId;
-          const userResponse = await axios.post(`/api/users/${uid}/tests`, {
-            testId,
+      if (uid) {
+        try {
+          await axios.post("/api/test/", {
+            firebaseID: uid,
+            prompt,
+            wordsTyped,
+            wordMistakes,
+            charsTyped,
+            charMistakes,
+            seconds,
           });
-          console.log(userResponse);
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.log(error);
+      } else {
+        console.log("UID not set");
       }
     };
 
@@ -142,9 +132,7 @@ function TypingTest() {
 
       setIndex((currentIndex) => {
         if (event.key === "Backspace") {
-          // return current index if it's already 0
           if (currentIndex === 0) return 0;
-          // Set the previous character to incorrect
           setCharArray((currentCharArray) => {
             const newCharArray = [...currentCharArray];
             newCharArray[currentIndex - 1].correct = false;
@@ -168,20 +156,18 @@ function TypingTest() {
           handleTestEnd();
         }
 
-        return currentIndex + 1; // Return the new index
+        return currentIndex + 1;
       });
     };
     if (!showResults) {
-      // Add the event listener
       window.addEventListener("keydown", handleKeyPress);
     }
-    // Clean up the event listener
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [
     index,
-    paragraph,
+    prompt,
     pause,
     start,
     showResults,
@@ -217,7 +203,6 @@ function TypingTest() {
     );
   }
 
-  // Separate charArray to typed characters and untyped characters
   const typedChars: charObjects[] = charArray.slice(0, index);
   const untypedChars: charObjects[] = charArray.slice(index, charArray.length);
 
@@ -263,7 +248,7 @@ function TypingTest() {
 }
 
 interface updateAccuracyParameters {
-  paragraph: string;
+  prompt: string;
   charArray: charObjects[];
   index: number;
   setTotalWords: React.Dispatch<React.SetStateAction<number>>;
@@ -277,7 +262,7 @@ interface updateAccuracyParameters {
 }
 
 function updateAccuracy({
-  paragraph,
+  prompt,
   charArray,
   index,
   setTotalWords,
@@ -289,7 +274,7 @@ function updateAccuracy({
   setCharMistakes,
   setCharAccuracy,
 }: updateAccuracyParameters) {
-  const wordArray = paragraph.split(" ");
+  const wordArray = prompt.split(" ");
   setTotalWords(wordArray.length);
   let wordsTyped = 0;
   let wordMistakes = 0;

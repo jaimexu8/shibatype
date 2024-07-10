@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
-    _id: {
+    firebaseID: {
       type: String,
       required: true,
     },
@@ -15,7 +15,8 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     tests: {
-      type: Array,
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Test" }],
+      default: [],
       required: true,
     },
   },
