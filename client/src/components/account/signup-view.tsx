@@ -12,12 +12,13 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../../app/userSlice";
 import { auth } from "../../config/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { AccountViewType } from "../../constants/constants";
 
 interface SignupViewProps {
-  setViewSignup: React.Dispatch<React.SetStateAction<boolean>>;
+  setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
 }
 
-export default function SignupView({ setViewSignup }: SignupViewProps) {
+export default function SignupView({ setAccountViewType }: SignupViewProps) {
   const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -122,7 +123,7 @@ export default function SignupView({ setViewSignup }: SignupViewProps) {
               <Link
                 href="#"
                 variant="body2"
-                onClick={() => setViewSignup(false)}
+                onClick={() => setAccountViewType(AccountViewType.Login)}
                 className="account-text"
               >
                 Already have an account? Sign in

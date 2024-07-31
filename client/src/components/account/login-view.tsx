@@ -8,35 +8,24 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import Container from "@mui/material/Container";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../app/userSlice";
 import { auth } from "../../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { AccountViewType } from "../../constants/constants";
 
 interface LoginViewProps {
-  setViewSignup: React.Dispatch<React.SetStateAction<boolean>>;
+  setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
 }
 
-export default function LoginView({ setViewSignup }: LoginViewProps) {
-  const dispatch = useDispatch();
+export default function LoginView({ setAccountViewType }: LoginViewProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const signIn = async () => {
     try {
-      const { user } = await signInWithEmailAndPassword(auth, email, password);
-      if (user) {
-        dispatch(
-          setUser({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-          })
-        );
-      }
-      console.log("User: ", user);
+      await signInWithEmailAndPassword(auth, email, password);
+      setAccountViewType(AccountViewType.Account);
     } catch (e) {
       console.error(e);
       if (e instanceof FirebaseError) {
@@ -48,10 +37,6 @@ export default function LoginView({ setViewSignup }: LoginViewProps) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     signIn();
-  };
-
-  const viewSignup = () => {
-    setViewSignup(true);
   };
 
   return (
@@ -108,7 +93,7 @@ export default function LoginView({ setViewSignup }: LoginViewProps) {
               <Link
                 href="#"
                 variant="body2"
-                onClick={viewSignup}
+                onClick={() => setAccountViewType(AccountViewType.Signup)}
                 className="account-text"
               >
                 {" "}
