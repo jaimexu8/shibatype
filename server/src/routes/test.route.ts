@@ -13,7 +13,6 @@ export default class TestRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post("/api/test/", validateTest, async (req, res) => {
-      console.log(1);
       try {
         const user = await UserModel.findOne({
           firebaseID: req.body.firebaseID,
@@ -21,8 +20,6 @@ export default class TestRoute implements Routes {
         if (!user) {
           return res.status(404).send({ message: "User not found." });
         }
-
-        console.log(2);
 
         const test = new TestModel(req.body);
         await test.save();
