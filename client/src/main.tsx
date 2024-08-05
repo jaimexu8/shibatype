@@ -1,7 +1,8 @@
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import store from "./app/store";
 import { Provider } from "react-redux";
+import { AuthProvider } from "./contexts/AuthContext";
+import store from "./app/store";
 import Root from "./routes/root";
 import Leaderboard from "./routes/leaderboard";
 import Store from "./routes/store";
@@ -37,6 +38,8 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <Provider store={store}>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </Provider>
 );

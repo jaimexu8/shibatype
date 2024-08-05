@@ -1,19 +1,16 @@
 import { auth } from "../../config/firebase";
 import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { clearUser } from "../../app/userSlice";
+import { AccountViewType } from "../../constants/constants";
 
-interface accountViewProps {
-  setViewSignup: React.Dispatch<React.SetStateAction<boolean>>;
+interface AccountViewProps {
+  setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
 }
 
-export default function AccountView({ setViewSignup }: accountViewProps) {
-  const dispatch = useDispatch();
+export default function AccountView({ setAccountViewType }: AccountViewProps) {
   const logoutUser = async () => {
     try {
       await signOut(auth);
-      setViewSignup(false);
-      dispatch(clearUser());
+      setAccountViewType(AccountViewType.Login);
     } catch (e) {
       console.error(e);
     }
