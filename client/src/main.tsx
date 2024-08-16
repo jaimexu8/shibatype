@@ -2,12 +2,14 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import store from "./app/store";
 import Root from "./routes/root";
 import Leaderboard from "./routes/leaderboard";
 import Store from "./routes/store";
 import Account from "./routes/account";
 import ErrorPage from "./error-page";
+import "./styles/base.css";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +41,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <Provider store={store}>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </AuthProvider>
   </Provider>
 );

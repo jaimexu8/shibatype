@@ -1,17 +1,15 @@
 import Header from "../components/header/header.js";
 import Footer from "../components/footer/footer.js";
-import { useSelector } from "react-redux";
-import { RootState } from "../app/store";
-import "../styles/base.css";
-import "../styles/theme.css";
-import "../styles/header.css";
+import { useTheme } from "../app/hooks.js";
 
 export default function Store() {
-  const selectTheme = (state: RootState) => state.theme.value;
-  const currentTheme = useSelector(selectTheme);
+  const { theme } = useTheme();
 
   return (
-    <div className="layout" id={currentTheme}>
+    <div
+      className="layout"
+      style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}
+    >
       <Header />
       <div className="main">
         <div className="content">

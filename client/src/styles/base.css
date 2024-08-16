@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Roboto+Mono&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Metal+Mania&family=Roboto+Mono&display=swap");
 
 * {
   font-family: "Roboto Mono";
@@ -36,13 +36,24 @@
   overflow-x: wrap;
 }
 
+.test-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .typing-field {
   display: inline;
+  flex-wrap: wrap;
   font-size: 25px;
   font-weight: 500;
 }
 
 .char-object {
   display: inline;
-  margin-right: 2px;
+}
+
+.typing-field-time {
+  margin-top: 10px;
 }

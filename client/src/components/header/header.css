@@ -18,9 +18,13 @@
   align-items: center;
 }
 
+:root {
+  --text-color: white;
+}
+
 .nav-container a {
   text-decoration: none;
-  color: white;
+  color: var(--text-color);
 }
 
 .nav-section {

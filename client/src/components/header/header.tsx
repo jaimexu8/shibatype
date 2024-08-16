@@ -7,8 +7,16 @@ import {
   faStore,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTheme } from "../../app/hooks";
+import { useEffect } from "react";
+import "./header.css";
 
 export default function Header() {
+  const { theme } = useTheme();
+  useEffect(() => {
+    document.documentElement.style.setProperty("--text-color", theme.textColor);
+  }, [theme]);
+
   return (
     <header className="header">
       <div className="nav-container">

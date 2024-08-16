@@ -13,6 +13,7 @@ import { setUser } from "../../app/userSlice";
 import { auth } from "../../config/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { AccountViewType } from "../../constants/constants";
+import { useTheme } from "../../app/hooks";
 
 interface SignupViewProps {
   setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
@@ -23,6 +24,8 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { theme } = useTheme();
 
   const signUp = async () => {
     try {
@@ -79,7 +82,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 label="Username"
                 autoFocus
                 onChange={(e) => setUsername(e.target.value)}
-                className="account-text-field"
+                style={{ backgroundColor: theme.primaryColor }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -91,7 +94,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 name="email"
                 autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
-                className="account-text-field"
+                style={{ backgroundColor: theme.primaryColor }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -104,7 +107,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 id="password"
                 autoComplete="new-password"
                 onChange={(e) => setPassword(e.target.value)}
-                className="account-text-field"
+                style={{ backgroundColor: theme.primaryColor }}
               />
             </Grid>
           </Grid>
@@ -114,7 +117,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
             onClick={signUp}
-            className="account-input-button"
+            style={{ backgroundColor: theme.secondaryColor }}
           >
             Sign Up
           </Button>
@@ -124,7 +127,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 href="#"
                 variant="body2"
                 onClick={() => setAccountViewType(AccountViewType.Login)}
-                className="account-text"
+                style={{ textDecoration: "none" }}
               >
                 Already have an account? Sign in
               </Link>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useTheme } from "../../app/hooks.ts";
 import TestStats from "./test-stats.tsx";
 import useTimer from "../../useTimer.ts";
 import axios from "axios";
@@ -40,6 +41,8 @@ function TypingTest() {
   const [charAccuracy, setCharAccuracy] = useState(0);
 
   const uid = useSelector((state: RootState) => state.user.uid);
+
+  const { theme } = useTheme();
 
   useEffect(() => {
     async function fetchQuote() {
@@ -212,11 +215,11 @@ function TypingTest() {
         {typedChars.map((charObject, index) => (
           <span
             key={index}
-            className={
-              "char-object " +
-              (charObject.correct
-                ? "typed-correct-char"
-                : "typed-incorrect-char")
+            className={"char-object"}
+            style={
+              charObject.correct
+                ? { color: theme.typedChar }
+                : { color: theme.typedChar, background: theme.incorrectChar }
             }
           >
             {charObject.character}
@@ -230,7 +233,11 @@ function TypingTest() {
     return (
       <span>
         {untypedChars.map((charObject, index) => (
-          <span key={index} className="char-object untyped-char">
+          <span
+            key={index}
+            className="char-object"
+            style={{ color: theme.untypedChar }}
+          >
             {charObject.character}
           </span>
         ))}
@@ -239,10 +246,12 @@ function TypingTest() {
   };
 
   return (
-    <div className="typing-field">
-      <TypedChars />
-      <UntypedChars />
-      <p>Time: {seconds}s</p>
+    <div className="test-container">
+      <div className="typing-field">
+        <TypedChars />
+        <UntypedChars />
+      </div>
+      {testRunning && <h2 className="typing-field-time">{seconds}s</h2>}
     </div>
   );
 }
