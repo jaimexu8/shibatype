@@ -9,8 +9,8 @@ import { useAuth, useTheme } from "../app/hooks";
 
 export default function Account() {
   const [accountViewType, setAccountViewType] = useState(AccountViewType.Login);
-  const { currentUser, login, signup, logout } = useAuth();
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     if (currentUser) {

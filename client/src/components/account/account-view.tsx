@@ -1,5 +1,4 @@
-import { auth } from "../../config/firebase";
-import { signOut } from "firebase/auth";
+import { useAuth } from "../../app/hooks";
 import { AccountViewType } from "../../constants/constants";
 
 interface AccountViewProps {
@@ -7,19 +6,17 @@ interface AccountViewProps {
 }
 
 export default function AccountView({ setAccountViewType }: AccountViewProps) {
-  const logoutUser = async () => {
-    try {
-      await signOut(auth);
-      setAccountViewType(AccountViewType.Login);
-    } catch (e) {
-      console.error(e);
-    }
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    setAccountViewType(AccountViewType.Login);
   };
 
   return (
     <div>
       <h1>Account</h1>
-      <button onClick={logoutUser}>Logout</button>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }
