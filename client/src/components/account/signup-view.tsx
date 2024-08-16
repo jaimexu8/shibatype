@@ -7,23 +7,20 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import api from "../../services/api";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../app/userSlice";
-import { auth } from "../../config/firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+
+import { useAuth } from "../../app/hooks";
 import { AccountViewType } from "../../constants/constants";
 import { useTheme } from "../../app/hooks";
 
 interface SignupViewProps {
-  setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
+  setAccountViewType: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function SignupView({ setAccountViewType }: SignupViewProps) {
-  const dispatch = useDispatch();
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { signup } = useAuth();
 
   const { theme } = useTheme();
 
@@ -54,6 +51,9 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
     } catch (e) {
       console.error(e);
     }
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await signup(email, username, password);
   };
 
   return (
@@ -70,7 +70,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <Box component="form" noValidate sx={{ mt: 3 }}>
+        <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -116,8 +116,12 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+<<<<<<< HEAD
             onClick={signUp}
             style={{ backgroundColor: theme.secondaryColor }}
+=======
+            className="account-input-button"
+>>>>>>> f44bdaa (auth)
           >
             Sign Up
           </Button>

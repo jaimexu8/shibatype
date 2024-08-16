@@ -8,11 +8,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import Container from "@mui/material/Container";
-import { auth } from "../../config/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { AccountViewType } from "../../constants/constants";
-import { useTheme } from "../../app/hooks";
+import { useTheme, useAuth } from "../../app/hooks";
 
 interface LoginViewProps {
   setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
@@ -24,22 +22,21 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { login } = useAuth();
 
-  const signIn = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setAccountViewType(AccountViewType.Account);
-    } catch (e) {
-      console.error(e);
-      if (e instanceof FirebaseError) {
+      const { user } = await login(email, password);
+      if (user) {
+        setAccountViewType(AccountViewType.Account);
+      }
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        console.error(error);
         setError("Invalid email or password");
       }
     }
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    signIn();
   };
 
   return (
@@ -110,8 +107,12 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+<<<<<<< HEAD
             onClick={signIn}
             style={{ backgroundColor: theme.secondaryColor }}
+=======
+            className="account-input-button"
+>>>>>>> f44bdaa (auth)
           >
             Sign In
           </Button>
