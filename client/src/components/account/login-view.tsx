@@ -12,12 +12,15 @@ import { auth } from "../../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { AccountViewType } from "../../constants/constants";
+import { useTheme } from "../../app/hooks";
 
 interface LoginViewProps {
   setAccountViewType: React.Dispatch<React.SetStateAction<AccountViewType>>;
 }
 
 export default function LoginView({ setAccountViewType }: LoginViewProps) {
+  const { theme } = useTheme();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -50,7 +53,11 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
           alignItems: "center",
         }}
       >
-        <Typography component="h1" variant="h4">
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{ color: theme.untypedChar }}
+        >
           Login
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
@@ -64,7 +71,17 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             autoComplete="email"
             autoFocus
             onChange={(e) => setEmail(e.target.value)}
-            className="account-text-field"
+            InputProps={{
+              style: {
+                color: theme.textColor,
+                backgroundColor: theme.primaryColor,
+              },
+            }}
+            InputLabelProps={{
+              style: {
+                color: theme.untypedChar,
+              },
+            }}
           />
           <TextField
             margin="normal"
@@ -76,7 +93,17 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             id="password"
             autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
-            className="account-text-field"
+            InputProps={{
+              style: {
+                color: theme.textColor,
+                backgroundColor: theme.primaryColor,
+              },
+            }}
+            InputLabelProps={{
+              style: {
+                color: theme.untypedChar,
+              },
+            }}
           />
           <Button
             type="submit"
@@ -84,7 +111,7 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
             onClick={signIn}
-            className="account-input-button"
+            style={{ backgroundColor: theme.secondaryColor }}
           >
             Sign In
           </Button>
@@ -94,7 +121,7 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
                 href="#"
                 variant="body2"
                 onClick={() => setAccountViewType(AccountViewType.Signup)}
-                className="account-text"
+                style={{ textDecoration: "none" }}
               >
                 {" "}
                 {"Don't have an account? Sign Up"}
