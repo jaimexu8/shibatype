@@ -17,12 +17,11 @@ interface LoginViewProps {
 }
 
 export default function LoginView({ setAccountViewType }: LoginViewProps) {
-  const { theme } = useTheme();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const { theme } = useTheme();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,7 +32,6 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
       }
     } catch (error) {
       if (error instanceof FirebaseError) {
-        console.error(error);
         setError("Invalid email or password");
       }
     }
@@ -107,12 +105,8 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-<<<<<<< HEAD
-            onClick={signIn}
             style={{ backgroundColor: theme.secondaryColor }}
-=======
             className="account-input-button"
->>>>>>> f44bdaa (auth)
           >
             Sign In
           </Button>

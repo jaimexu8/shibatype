@@ -7,10 +7,8 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-
-import { useAuth } from "../../app/hooks";
+import { useAuth, useTheme } from "../../app/hooks";
 import { AccountViewType } from "../../constants/constants";
-import { useTheme } from "../../app/hooks";
 
 interface SignupViewProps {
   setAccountViewType: React.Dispatch<React.SetStateAction<number>>;
@@ -21,36 +19,8 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { signup } = useAuth();
-
   const { theme } = useTheme();
 
-  const signUp = async () => {
-    try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      if (user) {
-        await updateProfile(user, { displayName: username });
-        const response = await api.post("/api/users", {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-        });
-        console.log(response.data);
-
-        dispatch(
-          setUser({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-          })
-        );
-      }
-    } catch (e) {
-      console.error(e);
-    }
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await signup(email, username, password);
@@ -116,12 +86,8 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-<<<<<<< HEAD
-            onClick={signUp}
             style={{ backgroundColor: theme.secondaryColor }}
-=======
             className="account-input-button"
->>>>>>> f44bdaa (auth)
           >
             Sign Up
           </Button>
