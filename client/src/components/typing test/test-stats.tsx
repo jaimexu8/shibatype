@@ -1,39 +1,24 @@
+import { Results } from "./typing-test.interface";
+
 interface TestStatsProps {
-  totalWords: number;
-  wordsTyped: number;
-  wordMistakes: number;
-  wordAccuracy: number;
-  totalChars: number;
-  charsTyped: number;
-  charMistakes: number;
-  charAccuracy: number;
-  seconds: number;
+  results: Results | null;
 }
 
-function TestStats({
-  totalWords,
-  wordsTyped,
-  wordMistakes,
-  wordAccuracy,
-  totalChars,
-  charsTyped,
-  charMistakes,
-  charAccuracy,
-  seconds,
-}: TestStatsProps) {
+function TestStats({ results }: TestStatsProps) {
+  if (!results) {
+    return <div>No results available</div>;
+  }
+
   return (
     <div>
-      <p>Total words: {totalWords}</p>
-      <p>Words typed correctly: {wordsTyped}</p>
-      <p>Words typed incorrectly: {wordMistakes}</p>
-      <p>Word accuracy: {wordAccuracy}%</p>
-      <br></br>
-      <p>Total characters: {totalChars}</p>
-      <p>Characters typed correctly: {charsTyped}</p>
-      <p>Character typed incorrectly: {charMistakes}</p>
-      <p>Character accuracy: {charAccuracy}%</p>
-      <br></br>
-      <p>Seconds: {seconds}s</p>
+      <p>Total Words: {results.totalWords}</p>
+      <p>Words Typed: {results.wordsTyped}</p>
+      <p>Word Mistakes: {results.wordMistakes}</p>
+      <p>Word Accuracy: {results.wordAccuracy}%</p>
+      <p>Total Characters: {results.totalChars}</p>
+      <p>Characters Typed: {results.charsTyped}</p>
+      <p>Character Mistakes: {results.charMistakes}</p>
+      <p>Character Accuracy: {results.charAccuracy}%</p>
     </div>
   );
 }

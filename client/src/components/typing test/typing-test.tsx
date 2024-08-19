@@ -1,51 +1,30 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useTheme } from "../../app/hooks.ts";
-import TestStats from "./test-stats.tsx";
-import useTimer from "../../useTimer.ts";
-import axios from "axios";
-
-interface charObjects {
-  character: string;
-  correct: boolean;
-}
-
-interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-}
-
-interface RootState {
-  user: User;
-}
+import { useState, useEffect, useCallback } from "react";
+import { useTheme } from "../../app/hooks";
+import { getAuth } from "firebase/auth";
+import { TestStatus, charRegex } from "../../constants/constants";
+import { CharObject, Results } from "./typing-test.interface";
+import TestStats from "./test-stats";
+import useTimer from "../../useTimer";
+import api from "../../services/api";
+import { getResults, updateAccuracy } from "./typing-test.utils";
 
 function TypingTest() {
   const [prompt, setPrompt] = useState(
     "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. Suspendisse potenti. Sed lectus."
   );
 
-  const [testRunning, setTestRunning] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [testStatus, setTestStatus] = useState(TestStatus.Idle);
   const { seconds, start, pause } = useTimer();
   const [index, setIndex] = useState(0);
-
-  const [totalWords, setTotalWords] = useState(0);
-  const [wordsTyped, setWordsTyped] = useState(0);
-  const [wordMistakes, setWordMistakes] = useState(0);
-  const [wordAccuracy, setWordAccuracy] = useState(0);
-
-  const [totalChars, setTotalChars] = useState(0);
-  const [charsTyped, setCharsTyped] = useState(0);
-  const [charMistakes, setCharMistakes] = useState(0);
-  const [charAccuracy, setCharAccuracy] = useState(0);
-
-  const uid = useSelector((state: RootState) => state.user.uid);
+  const [accuracy, setAccuracy] = useState(0);
+  const [results, setResults] = useState<Results | null>(null);
 
   const { theme } = useTheme();
+  const user = getAuth().currentUser;
 
   useEffect(() => {
     async function fetchQuote() {
+      /*
       // Fetch a random quote from the Quotable API
       const response = await fetch(
         "http://api.quotable.io/random?minLength=150&maxLength=500"
@@ -55,11 +34,12 @@ function TypingTest() {
         setPrompt(data.content);
       } else {
         console.log("Quote unable to be fetched", data.content);
-        // TODO: Create function to call from local database if quote cannot be fetched
       }
+        */
+      setPrompt("bruh bruh bruh");
     }
-    if (!showResults) fetchQuote();
-  }, [showResults]);
+    if (testStatus == TestStatus.Idle) fetchQuote();
+  }, [testStatus]);
 
   const [charArray, setCharArray] = useState(
     prompt.split("").map((char) => {
@@ -79,90 +59,90 @@ function TypingTest() {
     );
   }, [prompt]);
 
-  const charRegex = (key: string) => {
-    return /^[a-zA-Z0-9 ,./?;:'"-_]$/i.test(key);
-  };
+  const handleTestStart = useCallback(() => {
+    setIndex(0);
+    start();
+    setResults(null);
+    setTestStatus(TestStatus.Running);
+  }, [start, setResults, setTestStatus]);
 
-  useEffect(() => {
-    const handleTestStart = () => {
-      setIndex(0);
-      //start(60);
-      start();
-      setTestRunning(true);
-    };
-
-    const handleTestEnd = async () => {
-      updateAccuracy({
-        prompt,
-        charArray,
-        index,
-        setTotalWords,
-        setWordsTyped,
-        setWordMistakes,
-        setWordAccuracy,
-        setTotalChars,
-        setCharsTyped,
-        setCharMistakes,
-        setCharAccuracy,
-      });
-      setTestRunning(false);
+  const handleTestEnd = useCallback(() => {
+    if (testStatus !== TestStatus.Complete) {
+      setTestStatus(TestStatus.Complete);
       pause();
-      setShowResults(true);
+      setResults(getResults({ prompt, charArray, index }));
 
-      // Send test results to server
-      if (uid) {
+      if (user) {
+        console.log({
+          firebaseID: user.uid,
+          prompt,
+          wordsTyped: results?.wordsTyped,
+          wordMistakes: results?.wordMistakes,
+          charsTyped: results?.charsTyped,
+          charMistakes: results?.charMistakes,
+          seconds,
+        });
+        /*
         try {
-          await axios.post("/api/test/", {
-            firebaseID: uid,
-            prompt,
-            wordsTyped,
-            wordMistakes,
-            charsTyped,
-            charMistakes,
-            seconds,
-          });
+          await api.post("/api/test/", {
+          firebaseID: user.uid,
+          prompt,
+          wordsTyped: results.wordsTyped,
+          wordMistakes: results.wordMistakes,
+          charsTyped: results.charsTyped,
+          charMistakes: results.charMistakes,
+          seconds,
+        });
         } catch (error) {
           console.error(error);
         }
-      } else {
-        console.log("UID not set");
+        */
       }
-    };
+    }
+  }, [
+    charArray,
+    index,
+    pause,
+    prompt,
+    results?.charMistakes,
+    results?.charsTyped,
+    results?.wordMistakes,
+    results?.wordsTyped,
+    seconds,
+    testStatus,
+    user,
+  ]);
 
+  useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (!charRegex(event.key) && event.key !== "Backspace") return;
-      if (!testRunning) handleTestStart();
+      if (testStatus == TestStatus.Idle) handleTestStart();
 
-      setIndex((currentIndex) => {
-        if (event.key === "Backspace") {
-          if (currentIndex === 0) return 0;
-          setCharArray((currentCharArray) => {
-            const newCharArray = [...currentCharArray];
-            newCharArray[currentIndex - 1].correct = false;
-            return newCharArray;
-          });
-          return currentIndex - 1;
+      if (event.key === "Backspace") {
+        if (index == 0) return 0;
+        setCharArray((currentCharArray) => {
+          const newCharArray = [...currentCharArray];
+          newCharArray[index - 1].correct = false;
+          return newCharArray;
+        });
+        setIndex(index - 1);
+        return;
+      }
+
+      setCharArray((currentCharArray) => {
+        const charObj = currentCharArray[index];
+        if (event.key == charObj.character) {
+          currentCharArray[index] = {
+            character: charObj.character,
+            correct: true,
+          };
         }
-
-        if (event.key === charArray[currentIndex].character) {
-          // Set the current character to correct
-          setCharArray((currentCharArray) => {
-            const newCharArray = [...currentCharArray];
-            newCharArray[currentIndex].correct = true;
-            return newCharArray;
-          });
-        } else {
-          // Handle incorrect character
-        }
-
-        if (currentIndex === charArray.length - 1) {
-          handleTestEnd();
-        }
-
-        return currentIndex + 1;
+        return currentCharArray;
       });
+
+      setIndex(index + 1);
     };
-    if (!showResults) {
+    if (testStatus != TestStatus.Complete) {
       window.addEventListener("keydown", handleKeyPress);
     }
     return () => {
@@ -173,41 +153,37 @@ function TypingTest() {
     prompt,
     pause,
     start,
-    showResults,
     charArray,
-    testRunning,
-    uid,
-    totalWords,
-    wordsTyped,
-    wordMistakes,
-    wordAccuracy,
-    totalChars,
-    charsTyped,
-    charMistakes,
-    charAccuracy,
+    testStatus,
+    user,
     seconds,
+    handleTestStart,
+    handleTestEnd,
   ]);
 
-  if (showResults) {
+  useEffect(() => {
+    if (index > 0) {
+      updateAccuracy({
+        charArray,
+        index,
+        setAccuracy,
+      });
+    }
+    if (index == charArray.length) {
+      handleTestEnd();
+    }
+  }, [charArray, handleTestEnd, index]);
+
+  if (testStatus == TestStatus.Complete) {
     return (
       <div className="test-container">
-        <TestStats
-          totalWords={totalWords}
-          wordsTyped={wordsTyped}
-          wordMistakes={wordMistakes}
-          wordAccuracy={wordAccuracy}
-          totalChars={totalChars}
-          charsTyped={charsTyped}
-          charMistakes={charMistakes}
-          charAccuracy={charAccuracy}
-          seconds={seconds}
-        />
+        <TestStats results={results} />
       </div>
     );
   }
 
-  const typedChars: charObjects[] = charArray.slice(0, index);
-  const untypedChars: charObjects[] = charArray.slice(index, charArray.length);
+  const typedChars: CharObject[] = charArray.slice(0, index);
+  const untypedChars: CharObject[] = charArray.slice(index, charArray.length);
 
   const TypedChars: React.FC = () => {
     return (
@@ -251,85 +227,15 @@ function TypingTest() {
         <TypedChars />
         <UntypedChars />
       </div>
-      {testRunning && <h2 className="typing-field-time">{seconds}s</h2>}
+      {testStatus == TestStatus.Running && (
+        <div>
+          <h2 className="typing-field-time">{seconds}s</h2>
+          <h2 className="typing-field-time">{accuracy}%</h2>
+          <h2 className="typing-field-time">{index}</h2>
+        </div>
+      )}
     </div>
   );
-}
-
-interface updateAccuracyParameters {
-  prompt: string;
-  charArray: charObjects[];
-  index: number;
-  setTotalWords: React.Dispatch<React.SetStateAction<number>>;
-  setWordsTyped: React.Dispatch<React.SetStateAction<number>>;
-  setWordMistakes: React.Dispatch<React.SetStateAction<number>>;
-  setWordAccuracy: React.Dispatch<React.SetStateAction<number>>;
-  setTotalChars: React.Dispatch<React.SetStateAction<number>>;
-  setCharsTyped: React.Dispatch<React.SetStateAction<number>>;
-  setCharMistakes: React.Dispatch<React.SetStateAction<number>>;
-  setCharAccuracy: React.Dispatch<React.SetStateAction<number>>;
-}
-
-function updateAccuracy({
-  prompt,
-  charArray,
-  index,
-  setTotalWords,
-  setWordsTyped,
-  setWordMistakes,
-  setWordAccuracy,
-  setTotalChars,
-  setCharsTyped,
-  setCharMistakes,
-  setCharAccuracy,
-}: updateAccuracyParameters) {
-  const wordArray = prompt.split(" ");
-  setTotalWords(wordArray.length);
-  let wordsTyped = 0;
-  let wordMistakes = 0;
-
-  let wordCorrect = true;
-  let i = 0;
-  while (i <= index) {
-    if (charArray[i].character === " " || i == index) {
-      if (wordCorrect) wordsTyped += 1;
-      else {
-        wordMistakes += 1;
-        wordCorrect = true; // Reset for next word
-      }
-    } else {
-      if (!charArray[i].correct) wordCorrect = false;
-    }
-    i++;
-  }
-
-  setWordsTyped(wordsTyped);
-  setWordMistakes(wordMistakes);
-  if (wordsTyped > 0) {
-    setWordAccuracy(
-      parseFloat(((wordsTyped / wordArray.length) * 100).toFixed(2))
-    );
-  } else {
-    setWordAccuracy(0);
-  }
-
-  setTotalChars(charArray.length);
-  let charsTyped = 0;
-  let charMistakes = 0;
-  for (let i = 0; i <= index; i++) {
-    if (charArray[i].correct) {
-      charsTyped += 1;
-    } else {
-      charMistakes += 1;
-    }
-  }
-  setCharsTyped(charsTyped);
-  setCharMistakes(charMistakes);
-  if (charsTyped > 0) {
-    setCharAccuracy(
-      parseFloat(((charsTyped / charArray.length) * 100).toFixed(2))
-    );
-  }
 }
 
 export default TypingTest;
