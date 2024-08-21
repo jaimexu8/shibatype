@@ -1,6 +1,6 @@
 import Header from "../components/header/header.js";
 import Footer from "../components/footer/footer.js";
-import TypingTest from "../components/typing test/typing-test.tsx";
+import TypingTest from "../components/typing test/index.tsx";
 import { useTheme } from "../app/hooks.ts";
 
 export default function Root() {

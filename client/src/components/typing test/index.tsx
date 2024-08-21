@@ -1,22 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, CSSProperties } from "react";
 import { useTheme } from "../../app/hooks";
 import { getAuth } from "firebase/auth";
 import { TestStatus, charRegex } from "../../constants/constants";
 import { CharObject, Results } from "./typing-test.interface";
-import TestStats from "./test-stats";
+import { getResults, updateStats } from "./typing-test.utils";
+import { faRotateRight, faGear } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useTimer from "../../useTimer";
 import api from "../../services/api";
-import { getResults, updateAccuracy } from "./typing-test.utils";
 
 function TypingTest() {
-  const [prompt, setPrompt] = useState(
-    "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. Suspendisse potenti. Sed lectus."
-  );
+  const [prompt, setPrompt] = useState(" ");
 
   const [testStatus, setTestStatus] = useState(TestStatus.Idle);
-  const { seconds, start, pause } = useTimer();
+  const { seconds, start, pause, reset } = useTimer();
   const [index, setIndex] = useState(0);
-  const [accuracy, setAccuracy] = useState(0);
+  const [wpm, setWpm] = useState("0.0");
+  const [accuracy, setAccuracy] = useState("0.00");
   const [results, setResults] = useState<Results | null>(null);
 
   const { theme } = useTheme();
@@ -24,8 +24,7 @@ function TypingTest() {
 
   useEffect(() => {
     async function fetchQuote() {
-      /*
-      // Fetch a random quote from the Quotable API
+      ///*
       const response = await fetch(
         "http://api.quotable.io/random?minLength=150&maxLength=500"
       );
@@ -35,8 +34,8 @@ function TypingTest() {
       } else {
         console.log("Quote unable to be fetched", data.content);
       }
-        */
-      setPrompt("bruh bruh bruh");
+      //*/
+      //setPrompt("bruh bruh bruh");
     }
     if (testStatus == TestStatus.Idle) fetchQuote();
   }, [testStatus]);
@@ -59,6 +58,15 @@ function TypingTest() {
     );
   }, [prompt]);
 
+  const handleResetTest = useCallback(() => {
+    setIndex(0);
+    reset();
+    setWpm(0);
+    setAccuracy(0);
+    setResults(null);
+    setTestStatus(TestStatus.Idle);
+  }, [reset]);
+
   const handleTestStart = useCallback(() => {
     setIndex(0);
     start();
@@ -70,7 +78,7 @@ function TypingTest() {
     if (testStatus !== TestStatus.Complete) {
       setTestStatus(TestStatus.Complete);
       pause();
-      setResults(getResults({ prompt, charArray, index }));
+      setResults(getResults({ prompt, charArray, index, seconds }));
 
       if (user) {
         console.log({
@@ -112,6 +120,8 @@ function TypingTest() {
     testStatus,
     user,
   ]);
+
+  const openSettingsDialog = () => {};
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -163,24 +173,18 @@ function TypingTest() {
 
   useEffect(() => {
     if (index > 0) {
-      updateAccuracy({
+      updateStats({
         charArray,
         index,
+        seconds,
+        setWpm,
         setAccuracy,
       });
     }
     if (index == charArray.length) {
       handleTestEnd();
     }
-  }, [charArray, handleTestEnd, index]);
-
-  if (testStatus == TestStatus.Complete) {
-    return (
-      <div className="test-container">
-        <TestStats results={results} />
-      </div>
-    );
-  }
+  }, [charArray, handleTestEnd, index, seconds]);
 
   const typedChars: CharObject[] = charArray.slice(0, index);
   const untypedChars: CharObject[] = charArray.slice(index, charArray.length);
@@ -191,7 +195,6 @@ function TypingTest() {
         {typedChars.map((charObject, index) => (
           <span
             key={index}
-            className={"char-object"}
             style={
               charObject.correct
                 ? { color: theme.typedChar }
@@ -208,32 +211,78 @@ function TypingTest() {
   const UntypedChars: React.FC = () => {
     return (
       <span>
-        {untypedChars.map((charObject, index) => (
-          <span
-            key={index}
-            className="char-object"
-            style={{ color: theme.untypedChar }}
-          >
-            {charObject.character}
-          </span>
-        ))}
+        {untypedChars.map((charObject, index) => {
+          const style: CSSProperties = {
+            color: index === 0 ? theme.secondaryColor : theme.untypedChar,
+            borderBottomColor: theme.secondaryColor,
+            borderBottom: index === 0 ? "4px solid" : "none",
+            animation: index === 0 ? "blink 2s infinite" : "none",
+            "--blink-color": theme.secondaryColor,
+          } as CSSProperties;
+
+          return (
+            <span
+              key={index}
+              style={style}
+              className={index === 0 ? "blinking-underline" : ""}
+            >
+              {charObject.character}
+            </span>
+          );
+        })}
       </span>
     );
   };
 
   return (
-    <div className="test-container">
-      <div className="typing-field">
+    <div className="flex flex-col justify-center items-center text-2xl">
+      <div className="flex flex-row justify-between space-x-5 w-full">
+        <div className="flex-grow text-left">
+          <span>wpm: {wpm}</span>
+          <span className="ml-4">acc: {accuracy}%</span>
+        </div>
+        <div className="flex justify-center space-x-5">
+          <FontAwesomeIcon
+            icon={faRotateRight}
+            onClick={handleResetTest}
+            style={{
+              padding: "5px",
+              borderRadius: "5px",
+              cursor: "pointer",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = theme.primaryColor)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = theme.backgroundColor)
+            }
+          />
+          <FontAwesomeIcon
+            icon={faGear}
+            onClick={openSettingsDialog}
+            style={{
+              padding: "5px",
+              borderRadius: "5px",
+              cursor: "pointer",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = theme.primaryColor)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = theme.backgroundColor)
+            }
+          />
+        </div>
+      </div>
+      <div className="my-5">
         <TypedChars />
         <UntypedChars />
       </div>
-      {testStatus == TestStatus.Running && (
-        <div>
-          <h2 className="typing-field-time">{seconds}s</h2>
-          <h2 className="typing-field-time">{accuracy}%</h2>
-          <h2 className="typing-field-time">{index}</h2>
-        </div>
-      )}
+      <div>
+        <span>{seconds}s</span>
+      </div>
     </div>
   );
 }

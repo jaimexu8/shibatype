@@ -48,11 +48,7 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
           alignItems: "center",
         }}
       >
-        <Typography
-          component="h1"
-          variant="h4"
-          sx={{ color: theme.untypedChar }}
-        >
+        <Typography component="h1" variant="h4">
           Login
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
@@ -69,12 +65,12 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             InputProps={{
               style: {
                 color: theme.textColor,
-                backgroundColor: theme.primaryColor,
+                backgroundColor: theme.primaryDark,
               },
             }}
             InputLabelProps={{
               style: {
-                color: theme.untypedChar,
+                color: theme.primaryLight,
               },
             }}
           />
@@ -91,12 +87,12 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             InputProps={{
               style: {
                 color: theme.textColor,
-                backgroundColor: theme.primaryColor,
+                backgroundColor: theme.primaryDark,
               },
             }}
             InputLabelProps={{
               style: {
-                color: theme.untypedChar,
+                color: theme.primaryLight,
               },
             }}
           />
@@ -105,18 +101,17 @@ export default function LoginView({ setAccountViewType }: LoginViewProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            style={{ backgroundColor: theme.secondaryColor }}
+            style={{ backgroundColor: theme.primaryDark }}
             className="account-input-button"
           >
             Sign In
           </Button>
-          <Grid container>
+          <Grid container justifyContent="flex-end">
             <Grid item>
               <Link
                 href="#"
-                variant="body2"
                 onClick={() => setAccountViewType(AccountViewType.Signup)}
-                style={{ textDecoration: "none" }}
+                style={{ color: theme.textColor, textDecoration: "none" }}
               >
                 {" "}
                 {"Don't have an account? Sign Up"}

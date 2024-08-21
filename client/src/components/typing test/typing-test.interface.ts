@@ -3,19 +3,24 @@ export interface CharObject {
   correct: boolean;
 }
 
-export interface UpdateAccuracyParameters {
+export interface UpdateStatsParameters {
   charArray: CharObject[];
   index: number;
-  setAccuracy: React.Dispatch<React.SetStateAction<number>>;
+  seconds: number;
+  setWpm: React.Dispatch<React.SetStateAction<string>>;
+  setAccuracy: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface GetResultParameters {
   prompt: string;
   charArray: CharObject[];
   index: number;
+  seconds: number;
 }
 
 export interface Results {
+  wpm: number;
+  seconds: number;
   totalWords: number;
   wordsTyped: number;
   wordMistakes: number;

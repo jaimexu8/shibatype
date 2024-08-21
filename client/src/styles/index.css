@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Metal+Mania&family=Roboto+Mono&display=swap");
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   font-family: "Roboto Mono";
   margin: 0px;
@@ -36,24 +40,19 @@
   overflow-x: wrap;
 }
 
-.test-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+@keyframes blink {
+  0% {
+    border-bottom-color: var(--blink-color, currentColor);
+  }
+  50% {
+    border-bottom-color: transparent;
+  }
+  100% {
+    border-bottom-color: var(--blink-color, currentColor);
+  }
 }
 
-.typing-field {
-  display: inline;
-  flex-wrap: wrap;
-  font-size: 25px;
-  font-weight: 500;
-}
-
-.char-object {
-  display: inline;
-}
-
-.typing-field-time {
-  margin-top: 10px;
+.blinking-underline {
+  border-bottom: solid var(--blink-color, currentColor);
+  animation: blink 1s infinite;
 }

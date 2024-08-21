@@ -1,25 +1,44 @@
 import {
   GetResultParameters,
-  UpdateAccuracyParameters,
+  UpdateStatsParameters,
 } from "./typing-test.interface";
 
-export function updateAccuracy({
+export function updateStats({
   charArray,
   index,
+  seconds,
+  setWpm,
   setAccuracy,
-}: UpdateAccuracyParameters) {
-  let correct = 0;
-
+}: UpdateStatsParameters) {
+  if (seconds == 0) {
+    seconds = 1;
+  }
+  let correctChars = 0;
+  let correctWords = 0;
+  let wordCorrect = true;
   for (let i = 0; i < index; i++) {
     if (charArray[i].correct) {
-      correct++;
+      correctChars++;
+    } else {
+      wordCorrect = false;
+    }
+    if (charArray[i].character === " ") {
+      if (wordCorrect) {
+        correctWords++;
+      }
+      wordCorrect = true;
     }
   }
-
-  setAccuracy(parseFloat(((correct / index) * 100).toFixed(2)));
+  setWpm(((correctWords / seconds) * 60).toFixed(1));
+  setAccuracy(((correctChars / index) * 100).toFixed(2));
 }
 
-export function getResults({ prompt, charArray, index }: GetResultParameters) {
+export function getResults({
+  prompt,
+  charArray,
+  index,
+  seconds,
+}: GetResultParameters) {
   const wordArray = prompt.split(" ");
   const totalWords = wordArray.length;
   let wordsTyped = 0;
@@ -61,7 +80,11 @@ export function getResults({ prompt, charArray, index }: GetResultParameters) {
     charAccuracy = parseFloat(((charsTyped / totalChars) * 100).toFixed(2));
   }
 
+  const wpm = (wordsTyped / seconds) * 60;
+
   return {
+    wpm,
+    seconds,
     totalWords,
     wordsTyped,
     wordMistakes,

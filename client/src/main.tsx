@@ -7,7 +7,7 @@ import Leaderboard from "./routes/leaderboard";
 import Store from "./routes/store";
 import Account from "./routes/account";
 import ErrorPage from "./error-page";
-import "./styles/base.css";
+import "./styles/index.css";
 
 const router = createBrowserRouter([
   {
