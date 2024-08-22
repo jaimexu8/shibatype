@@ -23,5 +23,10 @@ export default function useCountdown() {
     setIsPaused(true);
   }
 
-  return { seconds, start, pause };
+  function reset() {
+    setSeconds(0);
+    setIsPaused(true);
+  }
+
+  return { seconds, start, pause, reset };
 }

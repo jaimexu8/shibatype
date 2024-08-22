@@ -37,7 +37,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
           alignItems: "center",
         }}
       >
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h4">
           Sign up
         </Typography>
         <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={handleSubmit}>
@@ -52,7 +52,17 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 label="Username"
                 autoFocus
                 onChange={(e) => setUsername(e.target.value)}
-                style={{ backgroundColor: theme.primaryColor }}
+                InputProps={{
+                  style: {
+                    color: theme.textColor,
+                    backgroundColor: theme.primaryDark,
+                  },
+                }}
+                InputLabelProps={{
+                  style: {
+                    color: theme.primaryLight,
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -64,7 +74,17 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 name="email"
                 autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ backgroundColor: theme.primaryColor }}
+                InputProps={{
+                  style: {
+                    color: theme.textColor,
+                    backgroundColor: theme.primaryDark,
+                  },
+                }}
+                InputLabelProps={{
+                  style: {
+                    color: theme.primaryLight,
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -77,7 +97,17 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
                 id="password"
                 autoComplete="new-password"
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ backgroundColor: theme.primaryColor }}
+                InputProps={{
+                  style: {
+                    color: theme.textColor,
+                    backgroundColor: theme.primaryDark,
+                  },
+                }}
+                InputLabelProps={{
+                  style: {
+                    color: theme.primaryLight,
+                  },
+                }}
               />
             </Grid>
           </Grid>
@@ -86,7 +116,7 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            style={{ backgroundColor: theme.secondaryColor }}
+            style={{ backgroundColor: theme.primaryDark }}
             className="account-input-button"
           >
             Sign Up
@@ -95,9 +125,8 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
             <Grid item>
               <Link
                 href="#"
-                variant="body2"
                 onClick={() => setAccountViewType(AccountViewType.Login)}
-                style={{ textDecoration: "none" }}
+                style={{ color: theme.textColor, textDecoration: "none" }}
               >
                 Already have an account? Sign in
               </Link>

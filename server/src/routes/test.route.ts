@@ -29,7 +29,6 @@ export default class TestRoute implements Routes {
 
         res.status(201).send(test);
       } catch (error) {
-        console.log(3);
         res
           .status(500)
           .send({ message: "Internal Server Error", error: error.message });
