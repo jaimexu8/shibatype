@@ -58,8 +58,8 @@ function TypingTest() {
   const handleResetTest = useCallback(() => {
     setIndex(0);
     reset();
-    setWpm(0);
-    setAccuracy(0);
+    setWpm("0");
+    setAccuracy("0");
     setResults(null);
     setTestStatus(TestStatus.Idle);
   }, [reset]);
