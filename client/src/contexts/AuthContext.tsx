@@ -45,24 +45,28 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signup = async (email: string, username: string, password: string) => {
-    try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      if (user) {
-        await updateProfile(user, { displayName: username });
-        await api.post("/api/user/", {
-          firebaseID: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-        });
-      }
-    } catch (error) {
-      console.error(error);
+  const signup = async (
+    email: string,
+    username: string,
+    password: string
+  ): Promise<UserCredential> => {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const { user } = userCredential;
+
+    if (user) {
+      await updateProfile(user, { displayName: username });
+      await api.post("/api/user/", {
+        firebaseID: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+      });
     }
+
+    return userCredential;
   };
 
   const logout = () => {

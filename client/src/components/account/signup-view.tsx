@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useAuth, useTheme } from "../../app/hooks";
 import { AccountViewType } from "../../constants/constants";
+import { FirebaseError } from "firebase/app";
 
 interface SignupViewProps {
   setAccountViewType: React.Dispatch<React.SetStateAction<number>>;
@@ -18,12 +19,24 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { signup } = useAuth();
   const { theme } = useTheme();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await signup(email, username, password);
+    try {
+      const { user } = await signup(email, username, password);
+      if (user) {
+        setAccountViewType(AccountViewType.Account);
+      }
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        setError(
+          "Invalid email, username, or password (Note: password must be 6 characters or more)"
+        );
+      }
+    }
   };
 
   return (
@@ -133,6 +146,13 @@ export default function SignupView({ setAccountViewType }: SignupViewProps) {
             </Grid>
           </Grid>
         </Box>
+        <Typography
+          variant="body2"
+          color="error"
+          sx={{ margin: "20px", textAlign: "center" }}
+        >
+          {error}
+        </Typography>
       </Box>
     </Container>
   );

@@ -71,37 +71,26 @@ function TypingTest() {
     setTestStatus(TestStatus.Running);
   }, [start, setResults, setTestStatus]);
 
-  const handleTestEnd = useCallback(() => {
+  const handleTestEnd = useCallback(async () => {
     if (testStatus !== TestStatus.Complete) {
       setTestStatus(TestStatus.Complete);
       pause();
       setResults(getResults({ prompt, charArray, index, seconds }));
 
       if (user) {
-        console.log({
-          firebaseID: user.uid,
-          prompt,
-          wordsTyped: results?.wordsTyped,
-          wordMistakes: results?.wordMistakes,
-          charsTyped: results?.charsTyped,
-          charMistakes: results?.charMistakes,
-          seconds,
-        });
-        /*
         try {
           await api.post("/api/test/", {
-          firebaseID: user.uid,
-          prompt,
-          wordsTyped: results.wordsTyped,
-          wordMistakes: results.wordMistakes,
-          charsTyped: results.charsTyped,
-          charMistakes: results.charMistakes,
-          seconds,
-        });
+            firebaseID: user.uid,
+            prompt,
+            wordsTyped: results?.wordsTyped,
+            wordMistakes: results?.wordMistakes,
+            charsTyped: results?.charsTyped,
+            charMistakes: results?.charMistakes,
+            seconds,
+          });
         } catch (error) {
           console.error(error);
         }
-        */
       }
     }
   }, [
