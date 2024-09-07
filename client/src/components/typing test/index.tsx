@@ -24,6 +24,7 @@ function TypingTest() {
 
   useEffect(() => {
     async function fetchQuote() {
+      /*
       const response = await fetch(
         "http://api.quotable.io/random?minLength=150&maxLength=500"
       );
@@ -33,6 +34,8 @@ function TypingTest() {
       } else {
         console.log("Quote unable to be fetched", data.content);
       }
+      */
+      setPrompt("bruh bruh bruh");
     }
     if (testStatus == TestStatus.Idle) fetchQuote();
   }, [testStatus]);
@@ -76,8 +79,12 @@ function TypingTest() {
       setTestStatus(TestStatus.Complete);
       pause();
       setResults(getResults({ prompt, charArray, index, seconds }));
+    }
+  }, [charArray, index, pause, prompt, seconds, testStatus]);
 
-      if (user) {
+  useEffect(() => {
+    if (results && user) {
+      const postResults = async () => {
         try {
           await api.post("/api/test/", {
             firebaseID: user.uid,
@@ -91,21 +98,10 @@ function TypingTest() {
         } catch (error) {
           console.error(error);
         }
-      }
+      };
+      postResults();
     }
-  }, [
-    charArray,
-    index,
-    pause,
-    prompt,
-    results?.charMistakes,
-    results?.charsTyped,
-    results?.wordMistakes,
-    results?.wordsTyped,
-    seconds,
-    testStatus,
-    user,
-  ]);
+  }, [prompt, results, seconds, user]);
 
   const openSettingsDialog = () => {};
 
