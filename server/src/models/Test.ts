@@ -6,6 +6,18 @@ const TestSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    displayName: {
+      type: String,
+      required: true,
+    },
+    wpm: {
+      type: Number,
+      required: true,
+    },
+    accuracy: {
+      type: Number,
+      required: true,
+    },
     prompt: {
       type: String,
       required: true,
