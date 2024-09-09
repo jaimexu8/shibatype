@@ -24,7 +24,6 @@ function TypingTest() {
 
   useEffect(() => {
     async function fetchQuote() {
-      /*
       const response = await fetch(
         "http://api.quotable.io/random?minLength=150&maxLength=500"
       );
@@ -34,8 +33,6 @@ function TypingTest() {
       } else {
         console.log("Quote unable to be fetched", data.content);
       }
-      */
-      setPrompt("bruh bruh bruh");
     }
     if (testStatus == TestStatus.Idle) fetchQuote();
   }, [testStatus]);
