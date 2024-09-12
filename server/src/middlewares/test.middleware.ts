@@ -7,3 +7,11 @@ export const validateTest = (
 ) => {
   next();
 };
+
+export const validateTestLeaderboard = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  next();
+};
