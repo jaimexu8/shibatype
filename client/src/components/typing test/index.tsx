@@ -24,6 +24,7 @@ function TypingTest() {
 
   useEffect(() => {
     async function fetchQuote() {
+      /*
       const response = await fetch(
         "http://api.quotable.io/random?minLength=150&maxLength=500"
       );
@@ -32,8 +33,10 @@ function TypingTest() {
         setPrompt(data.content);
       } else {
         console.log("Quote unable to be fetched", data.content);
-      }
+      }*/
+      setPrompt("bruh bruh");
     }
+
     if (testStatus == TestStatus.Idle) fetchQuote();
   }, [testStatus]);
 
@@ -75,7 +78,9 @@ function TypingTest() {
     if (testStatus !== TestStatus.Complete) {
       setTestStatus(TestStatus.Complete);
       pause();
-      setResults(getResults({ prompt, charArray, index, seconds }));
+      setResults(
+        getResults({ prompt, charArray, index, seconds: Math.max(seconds, 1) })
+      );
     }
   }, [charArray, index, pause, prompt, seconds, testStatus]);
 
@@ -85,12 +90,15 @@ function TypingTest() {
         try {
           await api.post("/api/test/", {
             firebaseID: user.uid,
+            displayName: user.displayName,
+            wpm: results?.wpm,
+            accuracy: results?.charAccuracy,
             prompt,
             wordsTyped: results?.wordsTyped,
             wordMistakes: results?.wordMistakes,
             charsTyped: results?.charsTyped,
             charMistakes: results?.charMistakes,
-            seconds,
+            seconds: Math.max(seconds, 1),
           });
         } catch (error) {
           console.error(error);
@@ -155,7 +163,7 @@ function TypingTest() {
       updateStats({
         charArray,
         index,
-        seconds,
+        seconds: Math.max(seconds, 1),
         setWpm,
         setAccuracy,
       });
