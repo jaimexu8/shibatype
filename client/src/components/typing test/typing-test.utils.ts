@@ -10,9 +10,6 @@ export function updateStats({
   setWpm,
   setAccuracy,
 }: UpdateStatsParameters) {
-  if (seconds == 0) {
-    seconds = 1;
-  }
   let correctChars = 0;
   let correctWords = 0;
   let wordCorrect = true;

@@ -22,7 +22,7 @@ beforeEach(async () => {
   await mongoose.connection.db.dropCollection("tests");
 });
 
-describe("POST /api/tests", () => {
+describe("POST /api/test/", () => {
   it("Typing test results should be saved", async () => {
     const createUserRes = await request(appInstance.app)
       .post("/api/user/")
@@ -32,5 +32,25 @@ describe("POST /api/tests", () => {
       .post("/api/test/")
       .send(defaultCreateTestData(createUserRes.body.firebaseID));
     expect(response.statusCode).toBe(201);
+  });
+});
+
+describe("GET /api/test/", () => {
+  it("Typing test leaderboard can be fetched", async () => {
+    const createUserRes = await request(appInstance.app)
+      .post("/api/user/")
+      .send(defaultUserData);
+
+    const response = await request(appInstance.app)
+      .post("/api/test/")
+      .send(defaultCreateTestData(createUserRes.body.firebaseID));
+
+    expect(response.statusCode).toBe(201);
+
+    const data = await request(appInstance.app)
+      .get("/api/test/leaderboard/")
+      .query({ sortOrder: -1, count: 100 });
+
+    expect(data.statusCode).toBe(201);
   });
 });

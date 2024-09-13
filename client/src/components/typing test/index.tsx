@@ -34,6 +34,7 @@ function TypingTest() {
         console.log("Quote unable to be fetched", data.content);
       }
     }
+
     if (testStatus == TestStatus.Idle) fetchQuote();
   }, [testStatus]);
 
@@ -75,7 +76,9 @@ function TypingTest() {
     if (testStatus !== TestStatus.Complete) {
       setTestStatus(TestStatus.Complete);
       pause();
-      setResults(getResults({ prompt, charArray, index, seconds }));
+      setResults(
+        getResults({ prompt, charArray, index, seconds: Math.max(seconds, 1) })
+      );
     }
   }, [charArray, index, pause, prompt, seconds, testStatus]);
 
@@ -85,12 +88,15 @@ function TypingTest() {
         try {
           await api.post("/api/test/", {
             firebaseID: user.uid,
+            displayName: user.displayName,
+            wpm: results?.wpm,
+            accuracy: results?.charAccuracy,
             prompt,
             wordsTyped: results?.wordsTyped,
             wordMistakes: results?.wordMistakes,
             charsTyped: results?.charsTyped,
             charMistakes: results?.charMistakes,
-            seconds,
+            seconds: Math.max(seconds, 1),
           });
         } catch (error) {
           console.error(error);
@@ -155,7 +161,7 @@ function TypingTest() {
       updateStats({
         charArray,
         index,
-        seconds,
+        seconds: Math.max(seconds, 1),
         setWpm,
         setAccuracy,
       });

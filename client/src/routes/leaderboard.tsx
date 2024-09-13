@@ -1,5 +1,6 @@
 import Header from "../components/header/header.js";
 import Footer from "../components/footer/footer.js";
+import LeaderboardTable from "../components/leaderboard/leaderboard-table.js";
 import { useTheme } from "../app/hooks.js";
 
 export default function Leaderboard() {
@@ -13,7 +14,7 @@ export default function Leaderboard() {
       <Header />
       <div className="main">
         <div className="content">
-          <h1>Page under development</h1>
+          <LeaderboardTable />
         </div>
       </div>
       <Footer />
