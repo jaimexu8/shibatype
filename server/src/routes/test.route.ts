@@ -49,18 +49,19 @@ export default class TestRoute implements Routes {
 
           const tests = await TestModel.find(
             {},
-            { firebaseID: 1, seconds: 1, createdAt: 1 }
+            { displayName: 1, wpm: 1, accuracy: 1, createdAt: 1 }
           )
-            .sort({ seconds: validatedSortOrder })
+            .sort({ wpm: validatedSortOrder })
             .limit(count);
 
           const formattedTests = tests.map((test) => ({
-            firebaseID: test.firebaseID,
-            seconds: test.seconds,
+            displayName: test.displayName,
+            wpm: test.wpm,
+            accuracy: test.accuracy,
             testDate: test.createdAt.toISOString().split("T")[0],
           }));
 
-          res.status(200).send(formattedTests);
+          res.status(201).send(formattedTests);
         } catch (error) {
           res.status(500).send({
             message: "Internal Server Error",

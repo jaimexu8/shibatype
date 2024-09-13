@@ -8,6 +8,9 @@ export const defaultTestPrompt =
 export function defaultCreateTestData(firebaseID: string): CreateTestData {
   return {
     firebaseID,
+    displayName: "user123",
+    wpm: 144,
+    accuracy: 95.37,
     prompt: defaultTestPrompt,
     wordsTyped: findTotalWords(defaultTestPrompt),
     wordMistakes: 4,
