@@ -30,3 +30,7 @@ export interface Results {
   charMistakes: number;
   charAccuracy: number;
 }
+
+export interface Settings {
+  wordCount: number;
+}

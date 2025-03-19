@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, CSSProperties } from "react";
 import { useTheme } from "../../app/hooks";
 import { getAuth } from "firebase/auth";
 import { TestStatus, charRegex } from "../../constants/constants";
-import { CharObject, Results } from "./typing-test.interface";
+import { CharObject, Results, Settings } from "./typing-test.interface";
 import { getResults, updateStats } from "./typing-test.utils";
 import { faRotateRight, faGear } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ function TypingTest() {
   const [wpm, setWpm] = useState("0.0");
   const [accuracy, setAccuracy] = useState("0.00");
   const [results, setResults] = useState<Results | null>(null);
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [settings, setSettings] = useState<Settings>({ wordCount: 30 });
 
   const { theme } = useTheme();
   const user = getAuth().currentUser;
@@ -28,7 +28,7 @@ function TypingTest() {
   useEffect(() => {
     async function fetchQuote() {
       try {
-        const params = { wordCount: 30 };
+        const params = { wordCount: settings.wordCount };
         const res = await api.get("/api/test/prompt/", { params });
         setPrompt(res.data.prompt);
       } catch (error) {
@@ -37,7 +37,7 @@ function TypingTest() {
     }
 
     if (testStatus == TestStatus.Idle) fetchQuote();
-  }, [testStatus]);
+  }, [testStatus, settings.wordCount]);
 
   const [charArray, setCharArray] = useState(
     prompt.split("").map((char) => {
@@ -113,6 +113,14 @@ function TypingTest() {
 
   const closeSettings = () => {
     setSettingsOpen(false);
+  };
+
+  const handleWordCountChange = (newWordCount: number) => {
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      wordCount: newWordCount,
+    }));
+    handleResetTest();
   };
 
   useEffect(() => {
@@ -275,7 +283,12 @@ function TypingTest() {
       <div>
         <span>{seconds}s</span>
       </div>
-      <SettingsDialog open={settingsOpen} onClose={closeSettings} />
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={closeSettings}
+        onWordCountChange={handleWordCountChange}
+        currentWordCount={settings.wordCount}
+      />
     </div>
   );
 }

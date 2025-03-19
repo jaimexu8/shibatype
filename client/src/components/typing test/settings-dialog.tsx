@@ -10,9 +10,16 @@ import { useTheme } from "../../app/hooks";
 interface SettingsDialogProps {
   open: boolean;
   onClose: () => void;
+  onWordCountChange: (wordCount: number) => void;
+  currentWordCount: number;
 }
 
-const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
+const SettingsDialog: React.FC<SettingsDialogProps> = ({
+  open,
+  onClose,
+  onWordCountChange,
+  currentWordCount,
+}) => {
   const { theme } = useTheme();
 
   return (
@@ -60,7 +67,20 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
             <Button
               key={num}
               variant="contained"
-              sx={{ background: theme.primaryLight, color: "#fff" }}
+              sx={{
+                background:
+                  currentWordCount === num
+                    ? theme.secondaryColor
+                    : theme.primaryColor,
+                color: "#fff",
+                "&:hover": {
+                  background: theme.primaryDark,
+                },
+              }}
+              onClick={() => {
+                onWordCountChange(num);
+                onClose();
+              }}
             >
               {num}
             </Button>
