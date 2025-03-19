@@ -25,5 +25,19 @@ export default class UserRoute implements Routes {
           .send({ message: "Internal Server Error", error: error.message });
       }
     });
+    this.router.get("/api/user/:firebaseID", async (req, res) => {
+      try {
+        const firebaseID = req.params.firebaseID;
+        const user = await UserModel.findOne({ firebaseID });
+        if (!user) {
+          return res.status(404).send({ message: "User not found" });
+        }
+        res.status(200).send(user);
+      } catch (error) {
+        res
+          .status(500)
+          .send({ message: "Internal Server Error", error: error.message });
+      }
+    });
   }
 }
