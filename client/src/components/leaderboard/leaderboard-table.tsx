@@ -37,7 +37,7 @@ export default function LeaderboardTable() {
 
   useEffect(() => {
     const loadLeaderboard = async () => {
-      const data = await fetchLeaderboard(1, 100);
+      const data = await fetchLeaderboard(-1, 100);
       setTests(data);
     };
 
@@ -86,10 +86,10 @@ export default function LeaderboardTable() {
                 {test.displayName}
               </TableCell>
               <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                {test.wpm}
+                {test.wpm.toFixed(2)}
               </TableCell>
               <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                {test.accuracy + "%"}
+                {test.accuracy.toFixed(2) + "%"}
               </TableCell>
               <TableCell sx={{ color: theme.textColor, border: "none" }}>
                 {test.testDate}
