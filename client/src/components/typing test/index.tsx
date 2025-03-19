@@ -8,9 +8,11 @@ import { faRotateRight, faGear } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useTimer from "../../useTimer";
 import api from "../../services/api";
+import SettingsDialog from "./settings-dialog";
 
 function TypingTest() {
   const [prompt, setPrompt] = useState(" ");
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [testStatus, setTestStatus] = useState(TestStatus.Idle);
   const { seconds, start, pause, reset } = useTimer();
@@ -18,20 +20,19 @@ function TypingTest() {
   const [wpm, setWpm] = useState("0.0");
   const [accuracy, setAccuracy] = useState("0.00");
   const [results, setResults] = useState<Results | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
 
   const { theme } = useTheme();
   const user = getAuth().currentUser;
 
   useEffect(() => {
     async function fetchQuote() {
-      const response = await fetch(
-        "http://api.quotable.io/random?minLength=150&maxLength=500"
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setPrompt(data.content);
-      } else {
-        console.log("Quote unable to be fetched", data.content);
+      try {
+        const params = { wordCount: 30 };
+        const res = await api.get("/api/test/prompt/", { params });
+        setPrompt(res.data.prompt);
+      } catch (error) {
+        console.error(error);
       }
     }
 
@@ -106,7 +107,13 @@ function TypingTest() {
     }
   }, [prompt, results, seconds, user]);
 
-  const openSettingsDialog = () => {};
+  const openSettings = () => {
+    setSettingsOpen(true);
+  };
+
+  const closeSettings = () => {
+    setSettingsOpen(false);
+  };
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -223,8 +230,8 @@ function TypingTest() {
     <div className="flex flex-col justify-center items-center text-2xl">
       <div className="flex flex-row justify-between space-x-5 w-full">
         <div className="flex-grow text-left">
-          <span>wpm: {wpm}</span>
-          <span className="ml-4">acc: {accuracy}%</span>
+          <span>wpm: {parseFloat(wpm).toFixed(2)}</span>
+          <span className="ml-4">acc: {parseFloat(accuracy).toFixed(2)}%</span>
         </div>
         <div className="flex justify-center space-x-5">
           <FontAwesomeIcon
@@ -245,7 +252,7 @@ function TypingTest() {
           />
           <FontAwesomeIcon
             icon={faGear}
-            onClick={openSettingsDialog}
+            onClick={openSettings}
             style={{
               padding: "5px",
               borderRadius: "5px",
@@ -268,6 +275,7 @@ function TypingTest() {
       <div>
         <span>{seconds}s</span>
       </div>
+      <SettingsDialog open={settingsOpen} onClose={closeSettings} />
     </div>
   );
 }

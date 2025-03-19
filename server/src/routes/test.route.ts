@@ -3,15 +3,36 @@ import { Routes } from "../interfaces/app.interface";
 import {
   validateTest,
   validateTestLeaderboard,
+  validateTestPrompt,
 } from "../middlewares/test.middleware";
 import TestModel from "../models/Test";
 import UserModel from "../models/User";
+import fs from "fs";
+import path from "path";
 
 export default class TestRoute implements Routes {
   public router = Router();
+  private words: string[] = [];
 
   constructor() {
+    this.loadWords();
     this.initializeRoutes();
+  }
+
+  private loadWords() {
+    const WORDS_FILE_PATH = path.join(__dirname, "../data/words.txt");
+    fs.readFile(WORDS_FILE_PATH, "utf8", (err, data) => {
+      if (err) {
+        console.error("Error loading words:", err);
+        return;
+      }
+      this.words = data.split("\n").filter((word) => word.trim().length > 0);
+    });
+  }
+
+  private getRandomWord() {
+    const randomIndex = Math.floor(Math.random() * this.words.length);
+    return this.words[randomIndex];
   }
 
   private initializeRoutes() {
@@ -37,6 +58,25 @@ export default class TestRoute implements Routes {
           .send({ message: "Internal Server Error", error: error.message });
       }
     });
+    this.router.get(
+      "/api/test/prompt/",
+      validateTestPrompt,
+      async (req, res) => {
+        try {
+          const wordCount = parseInt(req.query.wordCount as string, 10);
+          let prompt = this.getRandomWord();
+          for (let i = 1; i < wordCount; i++) {
+            prompt += " " + this.getRandomWord();
+          }
+          res.status(201).send({ prompt });
+        } catch (error) {
+          res.status(500).send({
+            message: "Internal Server Error",
+            error: error.message,
+          });
+        }
+      }
+    );
     this.router.get(
       "/api/test/leaderboard/",
       validateTestLeaderboard,
