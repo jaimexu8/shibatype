@@ -42,7 +42,7 @@ export default class TestRoute implements Routes {
           firebaseID: req.body.firebaseID,
         });
         if (!user) {
-          return res.status(404).send({ message: "User not found." });
+          return res.status(405).send({ message: "User not found." });
         }
 
         const test = new TestModel(req.body);

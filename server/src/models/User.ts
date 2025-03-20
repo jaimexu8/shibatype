@@ -19,6 +19,11 @@ const UserSchema = new mongoose.Schema(
       default: [],
       required: true,
     },
+    coins: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
     themes: {
       type: [String],
       default: ["dark"],
