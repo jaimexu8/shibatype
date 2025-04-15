@@ -29,6 +29,11 @@ const UserSchema = new mongoose.Schema(
       default: ["dark"],
       required: true,
     },
+    selectedTheme: {
+      type: String,
+      default: "dark",
+      required: true,
+    },
   },
   { timestamps: true }
 );

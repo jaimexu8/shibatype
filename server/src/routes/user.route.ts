@@ -39,6 +39,42 @@ export default class UserRoute implements Routes {
           .send({ message: "Internal Server Error", error: error.message });
       }
     });
+    this.router.get("/api/user/theme/:firebaseID", async (req, res) => {
+      try {
+        const firebaseID = req.params.firebaseID;
+        const user = await UserModel.findOne({ firebaseID });
+        if (!user) {
+          return res.status(404).send({ message: "User not found" });
+        }
+        res.status(200).send(user.selectedTheme);
+      } catch (error) {
+        res
+          .status(500)
+          .send({ message: "Internal Server Error", error: error.message });
+      }
+    });
+    this.router.post(
+      "/api/user/selectTheme/:firebaseID/:theme",
+      async (req, res) => {
+        try {
+          const firebaseID = req.params.firebaseID;
+          const user = await UserModel.findOne({ firebaseID });
+          if (!user) {
+            return res.status(404).send({ message: "User not found" });
+          }
+          user.selectedTheme = req.params.theme;
+          await user.save();
+          return res.status(200).send({
+            message: "Theme updated successfully",
+            theme: user.selectedTheme,
+          });
+        } catch (error) {
+          res
+            .status(500)
+            .send({ message: "Internal Server Error", error: error.message });
+        }
+      }
+    );
     this.router.put("/api/user/unlockTheme/:firebaseID", async (req, res) => {
       try {
         const firebaseID = req.params.firebaseID;
