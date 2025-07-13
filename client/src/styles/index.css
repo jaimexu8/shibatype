@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes flash {
+  0% {
+    color: var(--flash-primary, var(--primary-color));
+  }
+  25% {
+    color: var(--flash-text, var(--text-color));
+  }
+  50% {
+    color: var(--flash-primary, var(--primary-color));
+  }
+  75% {
+    color: var(--flash-text, var(--text-color));
+  }
+  100% {
+    color: var(--flash-primary, var(--primary-color));
+  }
+}
+
 * {
   font-family: "Roboto Mono";
   box-sizing: border-box;
@@ -39,6 +57,69 @@
   margin-left: auto;
   margin-right: auto;
   overflow-x: wrap;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.typing-test-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  width: 100%;
+}
+
+.typing-test-stats {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.typing-test-text {
+  margin: 1.25rem 0;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .typing-test-container {
+    font-size: 1.25rem;
+  }
+
+  .typing-test-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .typing-test-container {
+    font-size: 1rem;
+  }
+
+  .typing-test-text {
+    margin: 1rem 0;
+  }
 }
 
 @keyframes blink {

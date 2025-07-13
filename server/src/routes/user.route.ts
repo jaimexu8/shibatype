@@ -94,5 +94,32 @@ export default class UserRoute implements Routes {
           .send({ message: "Internal Server Error", error: error.message });
       }
     });
+    this.router.put("/api/user/addCoins/:firebaseID", async (req, res) => {
+      try {
+        const firebaseID = req.params.firebaseID;
+        const { coinsToAdd } = req.body;
+
+        if (!coinsToAdd || typeof coinsToAdd !== "number" || coinsToAdd < 0) {
+          return res.status(400).send({ message: "Invalid coins amount" });
+        }
+
+        const user = await UserModel.findOne({ firebaseID });
+        if (!user) {
+          return res.status(404).send({ message: "User not found" });
+        }
+
+        user.coins += coinsToAdd;
+        await user.save();
+
+        res.status(200).send({
+          message: "Coins added successfully",
+          coins: user.coins,
+        });
+      } catch (error) {
+        res
+          .status(500)
+          .send({ message: "Internal Server Error", error: error.message });
+      }
+    });
   }
 }

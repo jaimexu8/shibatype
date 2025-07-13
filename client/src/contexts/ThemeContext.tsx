@@ -50,6 +50,18 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     fetchUserTheme();
   }, [firebaseID]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty("--text-color", theme.textColor);
+    document.documentElement.style.setProperty(
+      "--primary-color",
+      theme.primaryColor
+    );
+    document.documentElement.style.setProperty(
+      "--secondary-color",
+      theme.secondaryColor
+    );
+  }, [theme]);
+
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}

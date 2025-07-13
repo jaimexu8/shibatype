@@ -1,4 +1,5 @@
 export interface Theme {
+  name: string;
   primaryColor: string;
   secondaryColor: string;
   backgroundColor: string;
@@ -11,6 +12,7 @@ export interface Theme {
 }
 
 export const dark: Theme = {
+  name: "dark",
   primaryColor: "#636669",
   secondaryColor: "#D6985C",
   backgroundColor: "#333437",
@@ -23,8 +25,9 @@ export const dark: Theme = {
 };
 
 export const cafe: Theme = {
-  primaryColor: "#fefae0",
-  secondaryColor: "#dda15e",
+  name: "cafe",
+  primaryColor: "#dda15e",
+  secondaryColor: "#fefae0",
   backgroundColor: "#763F0E",
   primaryDark: "#283618",
   primaryLight: "#606c38",
@@ -35,6 +38,7 @@ export const cafe: Theme = {
 };
 
 export const pine: Theme = {
+  name: "pine",
   primaryColor: "#dad7cd",
   secondaryColor: "#a3b18a",
   backgroundColor: "#588157",

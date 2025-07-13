@@ -2,6 +2,8 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { UserProvider } from "./contexts/UserContext";
+import ToastProvider from "./components/ToastContainer";
 import Root from "./routes/root";
 import Leaderboard from "./routes/leaderboard";
 import Store from "./routes/store";
@@ -39,7 +41,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <AuthProvider>
     <ThemeProvider>
-      <RouterProvider router={router} />
+      <UserProvider>
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
+      </UserProvider>
     </ThemeProvider>
   </AuthProvider>
 );

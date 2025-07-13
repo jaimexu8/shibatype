@@ -92,3 +92,62 @@ export function getResults({
     charAccuracy,
   };
 }
+
+export function calculateGoldReward(results: {
+  wpm: number;
+  charAccuracy: number;
+  wordAccuracy: number;
+  totalWords: number;
+}): number {
+  const { wpm, charAccuracy, wordAccuracy, totalWords } = results;
+
+  let goldReward = 5;
+
+  if (wpm >= 100) {
+    goldReward += 10;
+  } else if (wpm >= 80) {
+    goldReward += 8;
+  } else if (wpm >= 60) {
+    goldReward += 6;
+  } else if (wpm >= 40) {
+    goldReward += 4;
+  } else if (wpm >= 20) {
+    goldReward += 2;
+  }
+
+  if (charAccuracy >= 100) {
+    goldReward += 10;
+  } else if (charAccuracy >= 95) {
+    goldReward += 8;
+  } else if (charAccuracy >= 90) {
+    goldReward += 6;
+  } else if (charAccuracy >= 85) {
+    goldReward += 4;
+  } else if (charAccuracy >= 80) {
+    goldReward += 2;
+  }
+
+  if (wordAccuracy >= 100) {
+    goldReward += 5;
+  } else if (wordAccuracy >= 95) {
+    goldReward += 4;
+  } else if (wordAccuracy >= 90) {
+    goldReward += 3;
+  } else if (wordAccuracy >= 85) {
+    goldReward += 2;
+  } else if (wordAccuracy >= 80) {
+    goldReward += 1;
+  }
+
+  if (totalWords >= 50) {
+    goldReward += 5;
+  } else if (totalWords >= 30) {
+    goldReward += 3;
+  } else if (totalWords >= 20) {
+    goldReward += 2;
+  } else if (totalWords >= 10) {
+    goldReward += 1;
+  }
+
+  return Math.min(goldReward, 40);
+}

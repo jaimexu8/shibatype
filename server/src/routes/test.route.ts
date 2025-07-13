@@ -110,5 +110,28 @@ export default class TestRoute implements Routes {
         }
       }
     );
+    this.router.get("/api/test/user/:firebaseID", async (req, res) => {
+      try {
+        const firebaseID = req.params.firebaseID;
+        const tests = await TestModel.find({ firebaseID })
+          .sort({ createdAt: -1 })
+          .select("wpm accuracy createdAt seconds wordsTyped");
+
+        const formattedTests = tests.map((test) => ({
+          wpm: test.wpm,
+          accuracy: test.accuracy,
+          date: test.createdAt.toISOString().split("T")[0],
+          seconds: test.seconds,
+          wordsTyped: test.wordsTyped,
+        }));
+
+        res.status(200).send(formattedTests);
+      } catch (error) {
+        res.status(500).send({
+          message: "Internal Server Error",
+          error: error.message,
+        });
+      }
+    });
   }
 }

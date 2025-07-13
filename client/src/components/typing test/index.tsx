@@ -1,10 +1,19 @@
 import { useState, useEffect, useCallback, CSSProperties } from "react";
-import { useTheme } from "../../app/hooks";
+import { useTheme, useUser } from "../../app/hooks";
+import { useToast } from "../../hooks/useToast";
 import { getAuth } from "firebase/auth";
 import { TestStatus, charRegex } from "../../constants/constants";
 import { CharObject, Results, Settings } from "./typing-test.interface";
-import { getResults, updateStats } from "./typing-test.utils";
-import { faRotateRight, faGear } from "@fortawesome/free-solid-svg-icons";
+import {
+  getResults,
+  updateStats,
+  calculateGoldReward,
+} from "./typing-test.utils";
+import {
+  faRotateRight,
+  faGear,
+  faCoins,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useTimer from "../../useTimer";
 import api from "../../services/api";
@@ -13,6 +22,7 @@ import SettingsDialog from "./settings-dialog";
 function TypingTest() {
   const [prompt, setPrompt] = useState(" ");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [flashColor, setFlashColor] = useState<string>("");
 
   const [testStatus, setTestStatus] = useState(TestStatus.Idle);
   const { seconds, start, pause, reset } = useTimer();
@@ -23,13 +33,32 @@ function TypingTest() {
   const [settings, setSettings] = useState<Settings>({ wordCount: 30 });
 
   const { theme } = useTheme();
+  const { addCoins } = useUser();
+  const { showToast } = useToast();
   const user = getAuth().currentUser;
+
+  // Flash animation effect
+  useEffect(() => {
+    if (testStatus !== TestStatus.Complete) {
+      setFlashColor(theme.textColor);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setFlashColor((prevColor) =>
+        prevColor === theme.textColor ? theme.primaryColor : theme.textColor
+      );
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [testStatus, theme.textColor, theme.primaryColor]);
 
   useEffect(() => {
     async function fetchQuote() {
       try {
-        const params = { wordCount: settings.wordCount };
-        const res = await api.get("/api/test/prompt/", { params });
+        const res = await api.get("/api/test/prompt/", {
+          params: { wordCount: settings.wordCount },
+        });
         setPrompt(res.data.prompt);
       } catch (error) {
         console.error(error);
@@ -77,11 +106,49 @@ function TypingTest() {
     if (testStatus !== TestStatus.Complete) {
       setTestStatus(TestStatus.Complete);
       pause();
-      setResults(
-        getResults({ prompt, charArray, index, seconds: Math.max(seconds, 1) })
-      );
+      const testResults = getResults({
+        prompt,
+        charArray,
+        index,
+        seconds: Math.max(seconds, 1),
+      });
+      setResults(testResults);
+
+      if (user) {
+        const calculatedGoldReward = calculateGoldReward({
+          wpm: testResults.wpm,
+          charAccuracy: testResults.charAccuracy,
+          wordAccuracy: testResults.wordAccuracy,
+          totalWords: testResults.totalWords,
+        });
+
+        try {
+          await addCoins(calculatedGoldReward);
+          showToast(
+            <span>
+              +{calculatedGoldReward}{" "}
+              <FontAwesomeIcon icon={faCoins} style={{ marginLeft: "4px" }} />
+            </span>,
+            "success",
+            3000
+          );
+        } catch (error) {
+          console.error("Failed to award gold:", error);
+          showToast("Failed to award gold", "error", 3000);
+        }
+      }
     }
-  }, [charArray, index, pause, prompt, seconds, testStatus]);
+  }, [
+    charArray,
+    index,
+    pause,
+    prompt,
+    seconds,
+    testStatus,
+    user,
+    addCoins,
+    showToast,
+  ]);
 
   useEffect(() => {
     if (results && user) {
@@ -235,8 +302,8 @@ function TypingTest() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center text-2xl">
-      <div className="flex flex-row justify-between space-x-5 w-full">
+    <div className="typing-test-container">
+      <div className="typing-test-stats">
         <div className="flex-grow text-left">
           <span>wpm: {parseFloat(wpm).toFixed(2)}</span>
           <span className="ml-4">acc: {parseFloat(accuracy).toFixed(2)}%</span>
@@ -249,13 +316,14 @@ function TypingTest() {
               padding: "5px",
               borderRadius: "5px",
               cursor: "pointer",
-              transition: "background-color 0.3s ease",
+              transition: "color 0.2s ease",
+              color: flashColor || theme.textColor,
             }}
             onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = theme.primaryColor)
+              (e.currentTarget.style.color = theme.primaryColor)
             }
             onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = theme.backgroundColor)
+              (e.currentTarget.style.color = flashColor || theme.textColor)
             }
           />
           <FontAwesomeIcon
@@ -276,7 +344,7 @@ function TypingTest() {
           />
         </div>
       </div>
-      <div className="my-5">
+      <div className="typing-test-text">
         <TypedChars />
         <UntypedChars />
       </div>

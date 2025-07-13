@@ -1,6 +1,6 @@
 import Header from "../components/header/header.js";
 import Footer from "../components/footer/footer.js";
-import { useTheme } from "../app/hooks.js";
+import { useTheme, useUser } from "../app/hooks.js";
 import { useState, useEffect } from "react";
 import api from "../services/api.js";
 import { getAuth } from "firebase/auth";
@@ -11,6 +11,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 interface Theme {
   name: string;
@@ -24,28 +26,41 @@ interface Theme {
 
 export default function Store() {
   const { theme } = useTheme();
+  const { updateUserData } = useUser();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<
+    "info" | "success" | "warning" | "error"
+  >("info");
 
   useEffect(() => {
     async function fetchThemes() {
       try {
         const auth = getAuth();
         const currentUser = auth.currentUser;
-        if (!currentUser) {
-          console.error("No Firebase user found.");
-          return;
-        }
-
-        const userResponse = await api.get(`/api/user/${currentUser.uid}`);
-        setUser(userResponse.data);
 
         const themesResponse = await api.get("/api/store/themes");
         const fetchedThemes = themesResponse.data.themes || themesResponse.data;
         setThemes(fetchedThemes);
+
+        if (currentUser) {
+          try {
+            const userResponse = await api.get(`/api/user/${currentUser.uid}`);
+            setUser(userResponse.data);
+            setIsLoggedIn(true);
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+            setIsLoggedIn(false);
+          }
+        } else {
+          setIsLoggedIn(false);
+        }
       } catch (error) {
         console.error("Error fetching themes:", error);
       }
@@ -53,12 +68,35 @@ export default function Store() {
     fetchThemes();
   }, []);
 
+  const showToast = (
+    message: string,
+    severity: "info" | "success" | "warning" | "error" = "info"
+  ) => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
+
+  const handleCloseToast = () => {
+    setToastOpen(false);
+  };
+
   function handleThemeClick(selected: Theme) {
+    if (!isLoggedIn) {
+      showToast("Please sign in to purchase themes", "info");
+      return;
+    }
     setSelectedTheme(selected);
     setPurchaseDialogOpen(true);
   }
 
   async function handleConfirmPurchase() {
+    if (!isLoggedIn) {
+      showToast("Please sign in to purchase themes", "info");
+      setPurchaseDialogOpen(false);
+      return;
+    }
+
     if (user && user.coins >= 100 && selectedTheme) {
       try {
         const updatedUser = {
@@ -68,13 +106,15 @@ export default function Store() {
         };
         await api.put(`/api/user/unlockTheme/${user.firebaseID}`, updatedUser);
         setUser(updatedUser);
+        await updateUserData(); // Refresh user data in context
         setPurchaseDialogOpen(false);
+        showToast(`Successfully purchased ${selectedTheme.name}!`, "success");
       } catch (error) {
-        alert("There was an error purchasing this theme.");
+        showToast("There was an error purchasing this theme.", "error");
         console.error(error);
       }
     } else {
-      alert("Not enough coins to purchase this theme.");
+      showToast("Not enough coins to purchase this theme.", "warning");
       setPurchaseDialogOpen(false);
     }
   }
@@ -97,7 +137,8 @@ export default function Store() {
             }}
           >
             {themes.map((t, index) => {
-              const isUnlocked = user?.themes && user.themes.includes(t.name);
+              const isUnlocked =
+                isLoggedIn && user?.themes && user.themes.includes(t.name);
               return (
                 <div
                   key={index}
@@ -221,22 +262,192 @@ export default function Store() {
       <Dialog
         open={purchaseDialogOpen}
         onClose={() => setPurchaseDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.backgroundColor,
+            color: theme.textColor,
+            borderRadius: "12px",
+            border: `2px solid ${theme.primaryColor}`,
+            minWidth: "400px",
+            maxWidth: "500px",
+          },
+        }}
       >
-        <DialogTitle>Purchase Theme</DialogTitle>
-        <DialogContent>
-          <p>Do you want to purchase {selectedTheme?.name} for 100 coins?</p>
+        <DialogTitle
+          sx={{
+            textAlign: "center",
+            borderBottom: `1px solid ${theme.primaryColor}`,
+            padding: "24px 24px 16px 24px",
+            fontSize: "24px",
+            fontWeight: "600",
+            color: theme.primaryColor,
+          }}
+        >
+          Purchase Theme
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            padding: "24px",
+            textAlign: "center",
+          }}
+        >
+          {selectedTheme && (
+            <div style={{ marginBottom: "20px" }}>
+              <h3
+                style={{
+                  margin: "0 0 16px 0",
+                  fontSize: "20px",
+                  fontWeight: "500",
+                  color: theme.textColor,
+                }}
+              >
+                {selectedTheme.name}
+              </h3>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  justifyContent: "center",
+                  marginBottom: "16px",
+                }}
+              >
+                <div
+                  title="Primary Color"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    backgroundColor: selectedTheme.primaryColor,
+                    borderRadius: "8px",
+                    border: `2px solid ${theme.primaryColor}`,
+                  }}
+                />
+                <div
+                  title="Secondary Color"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    backgroundColor: selectedTheme.secondaryColor,
+                    borderRadius: "8px",
+                    border: `2px solid ${theme.primaryColor}`,
+                  }}
+                />
+                <div
+                  title="Primary Dark"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    backgroundColor: selectedTheme.primaryDark,
+                    borderRadius: "8px",
+                    border: `2px solid ${theme.primaryColor}`,
+                  }}
+                />
+                <div
+                  title="Primary Light"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    backgroundColor: selectedTheme.primaryLight,
+                    borderRadius: "8px",
+                    border: `2px solid ${theme.primaryColor}`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              fontSize: "18px",
+              fontWeight: "500",
+              color: theme.textColor,
+              marginBottom: "8px",
+            }}
+          >
+            <span>Price:</span>
+            <span style={{ color: theme.primaryColor }}>100</span>
+            <FontAwesomeIcon
+              icon={faCoins}
+              style={{
+                color: theme.secondaryColor,
+                fontSize: "20px",
+              }}
+            />
+          </div>
+          <p
+            style={{
+              margin: "0",
+              fontSize: "16px",
+              color: theme.textColor,
+              opacity: 0.8,
+            }}
+          >
+            Do you want to purchase this theme?
+          </p>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPurchaseDialogOpen(false)}>Cancel</Button>
+        <DialogActions
+          sx={{
+            padding: "16px 24px 24px 24px",
+            gap: "12px",
+            justifyContent: "center",
+          }}
+        >
+          <Button
+            onClick={() => setPurchaseDialogOpen(false)}
+            variant="outlined"
+            sx={{
+              borderColor: theme.primaryColor,
+              color: theme.primaryColor,
+              "&:hover": {
+                borderColor: theme.primaryDark,
+                backgroundColor: theme.primaryLight,
+              },
+            }}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={handleConfirmPurchase}
             variant="contained"
-            color="primary"
+            sx={{
+              backgroundColor: theme.primaryColor,
+              color: theme.backgroundColor,
+              "&:hover": {
+                backgroundColor: theme.primaryDark,
+              },
+            }}
           >
-            Confirm
+            Purchase
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseToast}
+          severity={toastSeverity}
+          sx={{
+            backgroundColor: theme.backgroundColor,
+            color: theme.textColor,
+            border: `1px solid ${theme.primaryColor}`,
+            "& .MuiAlert-icon": {
+              color: theme.primaryColor,
+            },
+            "& .MuiAlert-message": {
+              color: theme.textColor,
+            },
+          }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

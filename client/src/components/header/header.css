@@ -13,9 +13,25 @@
   margin-right: auto;
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 :root {
@@ -39,9 +55,33 @@
   text-decoration: none;
 }
 
+@media (max-width: 650px) {
+  .logo-text {
+    display: none;
+  }
+
+  .nav-container img {
+    display: none;
+  }
+}
+
 .nav-icon {
   font-size: 1.2rem;
   text-decoration: none;
   padding-left: 25px;
   padding-right: 25px;
+}
+
+@media (max-width: 768px) {
+  .nav-icon {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-icon {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }
