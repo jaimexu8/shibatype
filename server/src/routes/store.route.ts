@@ -16,9 +16,11 @@ export default class StoreRoute implements Routes {
         const themes: Theme[] = await ThemeModel.find();
         res.status(200).json({ themes });
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res.status(500).send({
           message: "Internal Server Error",
-          error: error.message,
+          error: errorMessage,
         });
       }
     });

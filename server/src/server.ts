@@ -7,8 +7,8 @@ import { config } from "./utils/config";
 
 export default class App {
   public app: express.Application;
-  public env: string;
-  public port: string;
+  public env: string = process.env.NODE_ENV || "development";
+  public port: string = config.port || "3000";
 
   constructor(routes: Routes[]) {
     this.app = express();
@@ -24,7 +24,9 @@ export default class App {
     try {
       await mongoose.connect(config.uri || "");
     } catch (error) {
-      console.error("Error connecting to database", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Error connecting to database", errorMessage);
       process.exit(1);
     }
   }

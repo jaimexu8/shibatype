@@ -53,9 +53,11 @@ export default class TestRoute implements Routes {
 
         res.status(201).send(test);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res
           .status(500)
-          .send({ message: "Internal Server Error", error: error.message });
+          .send({ message: "Internal Server Error", error: errorMessage });
       }
     });
     this.router.get(
@@ -70,9 +72,11 @@ export default class TestRoute implements Routes {
           }
           res.status(201).send({ prompt });
         } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           res.status(500).send({
             message: "Internal Server Error",
-            error: error.message,
+            error: errorMessage,
           });
         }
       }
@@ -103,9 +107,11 @@ export default class TestRoute implements Routes {
 
           res.status(201).send(formattedTests);
         } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           res.status(500).send({
             message: "Internal Server Error",
-            error: error.message,
+            error: errorMessage,
           });
         }
       }
@@ -127,9 +133,11 @@ export default class TestRoute implements Routes {
 
         res.status(200).send(formattedTests);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res.status(500).send({
           message: "Internal Server Error",
-          error: error.message,
+          error: errorMessage,
         });
       }
     });

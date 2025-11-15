@@ -20,9 +20,11 @@ export default class UserRoute implements Routes {
         await user.save();
         res.status(201).send(user);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res
           .status(500)
-          .send({ message: "Internal Server Error", error: error.message });
+          .send({ message: "Internal Server Error", error: errorMessage });
       }
     });
     this.router.get("/api/user/:firebaseID", async (req, res) => {
@@ -34,9 +36,11 @@ export default class UserRoute implements Routes {
         }
         res.status(200).send(user);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res
           .status(500)
-          .send({ message: "Internal Server Error", error: error.message });
+          .send({ message: "Internal Server Error", error: errorMessage });
       }
     });
     this.router.get("/api/user/theme/:firebaseID", async (req, res) => {
@@ -48,9 +52,11 @@ export default class UserRoute implements Routes {
         }
         res.status(200).send(user.selectedTheme);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res
           .status(500)
-          .send({ message: "Internal Server Error", error: error.message });
+          .send({ message: "Internal Server Error", error: errorMessage });
       }
     });
     this.router.post(
@@ -69,9 +75,11 @@ export default class UserRoute implements Routes {
             theme: user.selectedTheme,
           });
         } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           res
             .status(500)
-            .send({ message: "Internal Server Error", error: error.message });
+            .send({ message: "Internal Server Error", error: errorMessage });
         }
       }
     );
@@ -89,9 +97,11 @@ export default class UserRoute implements Routes {
         }
         res.status(200).send(updatedUser);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res
           .status(500)
-          .send({ message: "Internal Server Error", error: error.message });
+          .send({ message: "Internal Server Error", error: errorMessage });
       }
     });
     this.router.put("/api/user/addCoins/:firebaseID", async (req, res) => {
@@ -116,9 +126,11 @@ export default class UserRoute implements Routes {
           coins: user.coins,
         });
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         res
           .status(500)
-          .send({ message: "Internal Server Error", error: error.message });
+          .send({ message: "Internal Server Error", error: errorMessage });
       }
     });
   }

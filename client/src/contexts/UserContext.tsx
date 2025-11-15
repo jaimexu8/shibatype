@@ -3,7 +3,7 @@ import {
   ReactNode,
   useEffect,
   useState,
-  useContext,
+  useCallback,
 } from "react";
 import { useAuth } from "../app/hooks";
 import api from "../services/api";
@@ -32,7 +32,7 @@ export const UserProvider = ({ children }: UserProviderProps): JSX.Element => {
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
 
-  const updateUserData = async () => {
+  const updateUserData = useCallback(async () => {
     if (!currentUser) {
       setUserData(null);
       return;
@@ -45,7 +45,7 @@ export const UserProvider = ({ children }: UserProviderProps): JSX.Element => {
       console.error("Error fetching user data:", error);
       setUserData(null);
     }
-  };
+  }, [currentUser]);
 
   const addCoins = async (amount: number) => {
     if (!currentUser) return;
@@ -69,7 +69,7 @@ export const UserProvider = ({ children }: UserProviderProps): JSX.Element => {
 
   useEffect(() => {
     updateUserData();
-  }, [currentUser]);
+  }, [updateUserData]);
 
   const value = {
     userData,
@@ -78,12 +78,4 @@ export const UserProvider = ({ children }: UserProviderProps): JSX.Element => {
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
-};
-
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-  return context;
 };

@@ -11,14 +11,18 @@ const appInstance = new App(routes);
 
 beforeAll(async () => {
   await mongoose.connect(config.testUri);
-});
+}, 30000);
 
 afterAll(async () => {
   await mongoose.disconnect();
-});
+}, 30000);
 
 beforeEach(async () => {
-  await mongoose.connection.db.dropCollection("users");
+  try {
+    await mongoose.connection.db.dropCollection("users");
+  } catch (error) {
+    // Collection might not exist, which is fine
+  }
 });
 
 describe("POST /api/user/", () => {
