@@ -29,8 +29,8 @@ RUN npm ci --omit=dev
 # Copy built JavaScript from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy source files (for models, interfaces, etc. that might be needed at runtime)
-COPY --from=builder /app/src/data ./src/data
+# Copy data files to the location where compiled code expects them
+COPY --from=builder /app/src/data ./dist/data
 
 EXPOSE 3000
 

@@ -58,9 +58,11 @@ Customizable typing test website with a leaderboard, shop, user-authentication, 
 4. **Start development servers**
 
    ```bash
+   # Start server (runs on port 3000)
    cd server
    npm start
 
+   # Start client (runs on port 5173)
    cd client
    npm run dev
    ```
@@ -72,6 +74,9 @@ Customizable typing test website with a leaderboard, shop, user-authentication, 
    ```bash
    docker-compose up --build
    ```
+
+   - **Server**: http://localhost:3000
+   - **Client**: http://localhost:5173
 
 2. **Stop containers**:
 

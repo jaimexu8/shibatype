@@ -21,13 +21,38 @@ export default class App {
   }
 
   public async connectToDatabase() {
-    try {
-      await mongoose.connect(config.uri || "");
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error("Error connecting to database", errorMessage);
-      process.exit(1);
+    if (!config.uri) {
+      console.error(
+        "MongoDB URI is not configured. Please set the URI environment variable."
+      );
+      return;
+    }
+
+    const maxRetries = 5;
+    const retryDelay = 5000;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await mongoose.connect(config.uri);
+        console.log("Successfully connected to MongoDB");
+        return;
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        console.error(
+          `Error connecting to database (attempt ${attempt}/${maxRetries}):`,
+          errorMessage
+        );
+
+        if (attempt < maxRetries) {
+          console.log(`Retrying in ${retryDelay / 1000} seconds...`);
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        } else {
+          console.error(
+            "Failed to connect to database after all retries. Server will continue but database features may not work."
+          );
+        }
+      }
     }
   }
 
