@@ -24,7 +24,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy built JavaScript from builder stage
 COPY --from=builder /app/dist ./dist
@@ -36,4 +36,3 @@ EXPOSE 3000
 
 # Use node to run the compiled JavaScript
 CMD ["node", "dist/app.js"]
-

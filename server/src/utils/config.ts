@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+const rootEnvPath = path.resolve(__dirname, "../../../.env");
+
+dotenv.config({ path: rootEnvPath });
 
 export const config = {
   port: process.env.PORT,
