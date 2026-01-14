@@ -36,6 +36,9 @@ export function getResults({
   index,
   seconds,
 }: GetResultParameters) {
+  if (!prompt) {
+    prompt = "";
+  }
   const wordArray = prompt.split(" ");
   const totalWords = wordArray.length;
   let wordsTyped = 0;

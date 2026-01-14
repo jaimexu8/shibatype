@@ -46,7 +46,13 @@ export default function Store() {
         const currentUser = auth.currentUser;
 
         const themesResponse = await api.get("/api/store/themes");
-        const fetchedThemes = themesResponse.data.themes || themesResponse.data;
+        let fetchedThemes = themesResponse.data.themes || themesResponse.data;
+
+        if (!Array.isArray(fetchedThemes)) {
+          console.error("Invalid themes response format:", themesResponse.data);
+          fetchedThemes = [];
+        }
+
         setThemes(fetchedThemes);
 
         if (currentUser) {

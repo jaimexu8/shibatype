@@ -40,7 +40,13 @@ export const UserProvider = ({ children }: UserProviderProps): JSX.Element => {
 
     try {
       const response = await api.get(`/api/user/${currentUser.uid}`);
-      setUserData(response.data);
+      const data = response.data;
+
+      if (!Array.isArray(data.themes)) {
+        data.themes = [];
+      }
+
+      setUserData(data);
     } catch (error) {
       console.error("Error fetching user data:", error);
       setUserData(null);

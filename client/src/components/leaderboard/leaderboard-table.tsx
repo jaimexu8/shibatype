@@ -25,7 +25,15 @@ const fetchLeaderboard = async (sortOrder: 1 | -1, count: number) => {
     });
 
     const res = await api.get("/api/test/leaderboard/", { params });
-    return res.data;
+
+    if (Array.isArray(res.data)) {
+      return res.data;
+    } else if (res.data && Array.isArray(res.data.tests)) {
+      return res.data.tests;
+    } else {
+      console.error("Invalid leaderboard response format:", res.data);
+      return [];
+    }
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     return [];
@@ -42,7 +50,12 @@ export default function LeaderboardTable() {
   useEffect(() => {
     const loadLeaderboard = async () => {
       const data = await fetchLeaderboard(-1, 100);
-      setTests(data);
+      if (Array.isArray(data)) {
+        setTests(data);
+      } else {
+        console.error("Leaderboard data is not an array:", data);
+        setTests([]);
+      }
     };
 
     loadLeaderboard();
@@ -100,16 +113,16 @@ export default function LeaderboardTable() {
                   {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                 </TableCell>
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.displayName}
+                  {test.displayName || "Anonymous"}
                 </TableCell>
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.wpm.toFixed(2)}
+                  {test.wpm ? test.wpm.toFixed(2) : "0.00"}
                 </TableCell>
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.accuracy.toFixed(2) + "%"}
+                  {test.accuracy ? test.accuracy.toFixed(2) + "%" : "0.00%"}
                 </TableCell>
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.testDate}
+                  {test.testDate || "N/A"}
                 </TableCell>
               </TableRow>
             ))}

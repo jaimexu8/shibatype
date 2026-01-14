@@ -8,7 +8,7 @@ import { config } from "./utils/config";
 export default class App {
   public app: express.Application;
   public env: string = process.env.NODE_ENV || "development";
-  public port: string = config.port || "3000";
+  public port: string = process.env.PORT || "3000";
 
   constructor(routes: Routes[]) {
     this.app = express();
@@ -57,8 +57,8 @@ export default class App {
   }
 
   public async listen() {
-    return this.app.listen(config.port, () => {
-      console.log(`Server running on port: ${config.port}`);
+    return this.app.listen(this.port, () => {
+      console.log(`Server running on port: ${this.port}`);
     });
   }
 }

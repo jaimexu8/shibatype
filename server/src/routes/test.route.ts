@@ -20,14 +20,32 @@ export default class TestRoute implements Routes {
   }
 
   private loadWords() {
-    const WORDS_FILE_PATH = path.join(__dirname, "../data/words.txt");
-    fs.readFile(WORDS_FILE_PATH, "utf8", (err, data) => {
-      if (err) {
-        console.error("Error loading words:", err);
-        return;
+    try {
+      let WORDS_FILE_PATH = path.join(__dirname, "../data/words.txt");
+
+      if (!fs.existsSync(WORDS_FILE_PATH)) {
+        WORDS_FILE_PATH = path.join(__dirname, "../../../api/words.txt");
       }
+
+      if (!fs.existsSync(WORDS_FILE_PATH)) {
+        WORDS_FILE_PATH = path.join(process.cwd(), "api/words.txt");
+      }
+
+      if (!fs.existsSync(WORDS_FILE_PATH)) {
+        WORDS_FILE_PATH = path.join(process.cwd(), "server/src/data/words.txt");
+      }
+
+      const data = fs.readFileSync(WORDS_FILE_PATH, "utf8");
       this.words = data.split("\n").filter((word) => word.trim().length > 0);
-    });
+      console.log(`Loaded ${this.words.length} words from ${WORDS_FILE_PATH}`);
+    } catch (err) {
+      console.error("Error loading words:", err);
+      this.words = [
+        "the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
+        "pack", "my", "box", "with", "five", "dozen", "liquor", "jugs",
+        "how", "vexingly", "daft", "jumping", "zebras", "waltz"
+      ];
+    }
   }
 
   private getRandomWord() {

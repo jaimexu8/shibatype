@@ -59,9 +59,15 @@ function TypingTest() {
         const res = await api.get("/api/test/prompt/", {
           params: { wordCount: settings.wordCount },
         });
-        setPrompt(res.data.prompt);
+        if (res.data && res.data.prompt && typeof res.data.prompt === 'string') {
+          setPrompt(res.data.prompt);
+        } else {
+          console.error("Invalid prompt received from server");
+          setPrompt("the quick brown fox jumps over the lazy dog");
+        }
       } catch (error) {
         console.error(error);
+        setPrompt("the quick brown fox jumps over the lazy dog");
       }
     }
 
@@ -69,7 +75,7 @@ function TypingTest() {
   }, [testStatus, settings.wordCount]);
 
   const [charArray, setCharArray] = useState(
-    prompt.split("").map((char) => {
+    (prompt || " ").split("").map((char) => {
       return {
         character: char,
         correct: false,
@@ -78,12 +84,14 @@ function TypingTest() {
   );
 
   useEffect(() => {
-    setCharArray(
-      prompt.split("").map((char) => ({
-        character: char,
-        correct: false,
-      }))
-    );
+    if (prompt) {
+      setCharArray(
+        prompt.split("").map((char) => ({
+          character: char,
+          correct: false,
+        }))
+      );
+    }
   }, [prompt]);
 
   const handleResetTest = useCallback(() => {

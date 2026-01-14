@@ -1,0 +1,16 @@
+node_modules
+client/node_modules
+server/node_modules
+server/dist
+server/src/tests
+*.test.ts
+*.spec.ts
+.git
+.github
+.DS_Store
+docker-compose.yml
+Dockerfile
+server/Dockerfile
+README.md
+.env.local
+.env.example

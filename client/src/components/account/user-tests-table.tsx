@@ -70,13 +70,13 @@ export default function UserTestsTable({ tests }: UserTestsTableProps) {
                 }}
               >
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.wpm.toFixed(1)}
+                  {test.wpm ? test.wpm.toFixed(1) : "0.0"}
                 </TableCell>
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.accuracy.toFixed(1)}%
+                  {test.accuracy ? test.accuracy.toFixed(1) + "%" : "0.0%"}
                 </TableCell>
                 <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.date}
+                  {test.date || "N/A"}
                 </TableCell>
               </TableRow>
             ))}

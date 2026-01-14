@@ -29,9 +29,15 @@ export default function AccountView({ setAccountViewType }: AccountViewProps) {
       if (currentUser?.uid) {
         try {
           const response = await api.get(`/api/test/user/${currentUser.uid}`);
-          setTests(response.data);
+          if (Array.isArray(response.data)) {
+            setTests(response.data);
+          } else {
+            console.error("Invalid user tests response format:", response.data);
+            setTests([]);
+          }
         } catch (error) {
           console.error("Error fetching user tests:", error);
+          setTests([]);
         } finally {
           setLoading(false);
         }
