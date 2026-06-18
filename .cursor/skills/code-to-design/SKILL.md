@@ -28,6 +28,11 @@ Follow these steps to convert your existing code.
 
 - A built web application directory containing `index.html` and assets.
 - Target Stitch `projectId` (use `list_projects` if unknown).
+- **If pages load data from an API** (leaderboards, stores, dashboards, etc.):
+  start the backend server and seed or verify data **before** capturing HTML.
+  The Vite dev server alone is not enough — API-dependent UI will render empty
+  without a running backend. Wait for loaded content using `--wait-for-selector`
+  on the snapshot script, or confirm data is visible before capturing.
 
 ### Steps
 

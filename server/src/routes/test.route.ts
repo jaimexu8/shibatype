@@ -7,6 +7,10 @@ import {
 } from "../middlewares/test.middleware";
 import TestModel from "../models/Test";
 import UserModel from "../models/User";
+import {
+  isStitchPreview,
+  STITCH_PREVIEW_LEADERBOARD,
+} from "../data/stitch-preview";
 import fs from "fs";
 import path from "path";
 
@@ -103,6 +107,11 @@ export default class TestRoute implements Routes {
       "/api/test/leaderboard/",
       validateTestLeaderboard,
       async (req, res) => {
+        if (isStitchPreview()) {
+          const count = parseInt(req.query.count as string, 10) || 10;
+          return res.status(201).send(STITCH_PREVIEW_LEADERBOARD.slice(0, count));
+        }
+
         try {
           const sortOrder = parseInt(req.query.sortOrder as string, 10);
           const validatedSortOrder: 1 | -1 = sortOrder === -1 ? -1 : 1;

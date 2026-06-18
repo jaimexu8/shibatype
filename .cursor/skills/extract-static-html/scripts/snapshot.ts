@@ -48,6 +48,8 @@ interface Opts {
   inlineFonts: boolean;
   removeSelectors: string | null;
   click: string | null;
+  waitForSelector: string | null;
+  waitForSelectorTimeout: number;
 }
 
 interface Stats {
@@ -86,6 +88,8 @@ function parseArgs(): Opts {
     inlineFonts: false,
     removeSelectors: null,
     click: null,
+    waitForSelector: null,
+    waitForSelectorTimeout: 15000,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -131,6 +135,12 @@ function parseArgs(): Opts {
         break;
       case '--click':
         opts.click = args[++i];
+        break;
+      case '--wait-for-selector':
+        opts.waitForSelector = args[++i];
+        break;
+      case '--wait-for-selector-timeout':
+        opts.waitForSelectorTimeout = parseInt(args[++i], 10);
         break;
       case '--help':
         console.log(`
@@ -306,6 +316,22 @@ async function snapshot(opts: Opts): Promise<void> {
         waitUntil: 'networkidle2',
         timeout: Math.min(30000, opts.timeout - 5000),
       });
+    }
+
+    // Wait for async content (API fetches, client-side rendering)
+    if (opts.waitForSelector) {
+      console.log(
+        `⏳ Waiting for selector "${opts.waitForSelector}" (timeout ${opts.waitForSelectorTimeout}ms)...`,
+      );
+      try {
+        await page.waitForSelector(opts.waitForSelector, {
+          timeout: opts.waitForSelectorTimeout,
+        });
+      } catch {
+        const msg = `Selector "${opts.waitForSelector}" not found within ${opts.waitForSelectorTimeout}ms`;
+        console.warn(`⚠️  ${msg}`);
+        stats.warnings.push(msg);
+      }
     }
 
     // Extra wait for JS-rendered content (animations, lazy loading, etc.)

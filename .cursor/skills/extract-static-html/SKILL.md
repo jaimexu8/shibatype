@@ -81,6 +81,8 @@ Launches headless Chrome, captures the fully rendered DOM, and produces a self-c
 | `--url` | *(required)* | URL to capture |
 | `--output` | *(required)* | Output file path |
 | `--wait` | `1000` | Extra wait (ms) after network idle. Increase for lazy-loading apps. |
+| `--wait-for-selector` | — | CSS selector to wait for before capture (e.g. `tbody tr` for loaded tables) |
+| `--wait-for-selector-timeout` | `15000` | Max wait (ms) for `--wait-for-selector` |
 | `--viewport` | `1280x800` | Viewport size as `WIDTHxHEIGHT` |
 | `--html-class` | — | Class(es) for `<html>` element (e.g., `dark`) |
 | `--remove-fixed` | `false` | Remove fixed/sticky elements (cookie banners, chat widgets) |
