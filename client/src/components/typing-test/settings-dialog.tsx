@@ -3,7 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
+import { Close as CloseIcon } from "@mui/icons-material";
 import { Button, Typography, Box } from "@mui/material";
 import { useTheme } from "../../app/hooks";
 

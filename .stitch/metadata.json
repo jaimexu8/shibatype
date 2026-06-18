@@ -1,0 +1,42 @@
+{
+  "projectId": "10530781707561921305",
+  "title": "Shibatype",
+  "designSystem": {
+    "assetId": "777fce87cd0944068019742a309d2234",
+    "displayName": "Shibatype Design System",
+    "source": "stitch::code-to-design"
+  },
+  "screens": [
+    {
+      "id": "2782322256373239764",
+      "title": "DESIGN.md",
+      "type": "DOCUMENT",
+      "file": "DESIGN.md"
+    },
+    {
+      "id": "4845818970383402510",
+      "title": "Home - Typing Test",
+      "type": "DESIGN",
+      "file": "home.html"
+    },
+    {
+      "id": "13949535151010235897",
+      "title": "Leaderboard",
+      "type": "DESIGN",
+      "file": "leaderboard.html"
+    },
+    {
+      "id": "12761794577950268785",
+      "title": "Theme Store",
+      "type": "DESIGN",
+      "file": "store.html"
+    },
+    {
+      "id": "16430263871343106682",
+      "title": "Account / Login",
+      "type": "DESIGN",
+      "file": "account.html"
+    }
+  ],
+  "lastUpdated": "2026-06-18T05:09:46Z"
+}
