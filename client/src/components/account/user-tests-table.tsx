@@ -8,6 +8,7 @@ import Paper from "@mui/material/Paper";
 import { useTheme } from "../../app/hooks";
 import { useState, useMemo } from "react";
 import Pagination from "../Pagination";
+import Skeleton from "../Skeleton";
 
 interface Test {
   wpm: number;
@@ -19,11 +20,12 @@ interface Test {
 
 interface UserTestsTableProps {
   tests: Test[];
+  loading?: boolean;
 }
 
 const ITEMS_PER_PAGE = 10;
 
-export default function UserTestsTable({ tests }: UserTestsTableProps) {
+export default function UserTestsTable({ tests, loading = false }: UserTestsTableProps) {
   const { theme } = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -60,26 +62,49 @@ export default function UserTestsTable({ tests }: UserTestsTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedTests.map((test, index) => (
-              <TableRow
-                key={index}
-                sx={{
-                  backgroundColor:
-                    index % 2 === 0 ? theme.backgroundColor : theme.primaryDark,
-                  "&:last-child td, &:last-child th": { border: 0 },
-                }}
-              >
-                <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.wpm ? test.wpm.toFixed(1) : "0.0"}
-                </TableCell>
-                <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.accuracy ? test.accuracy.toFixed(1) + "%" : "0.0%"}
-                </TableCell>
-                <TableCell sx={{ color: theme.textColor, border: "none" }}>
-                  {test.date || "N/A"}
-                </TableCell>
-              </TableRow>
-            ))}
+            {loading ? (
+              Array.from({ length: 10 }).map((_, index) => (
+                <TableRow
+                  key={`skeleton-${index}`}
+                  sx={{
+                    backgroundColor:
+                      index % 2 === 0 ? theme.backgroundColor : theme.primaryDark,
+                    "&:last-child td, &:last-child th": { border: 0 },
+                  }}
+                >
+                  <TableCell sx={{ border: "none", padding: "16px" }}>
+                    <Skeleton width="40px" />
+                  </TableCell>
+                  <TableCell sx={{ border: "none", padding: "16px" }}>
+                    <Skeleton width="40px" />
+                  </TableCell>
+                  <TableCell sx={{ border: "none", padding: "16px" }}>
+                    <Skeleton width="80px" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              paginatedTests.map((test, index) => (
+                <TableRow
+                  key={index}
+                  sx={{
+                    backgroundColor:
+                      index % 2 === 0 ? theme.backgroundColor : theme.primaryDark,
+                    "&:last-child td, &:last-child th": { border: 0 },
+                  }}
+                >
+                  <TableCell sx={{ color: theme.textColor, border: "none" }}>
+                    {test.wpm ? test.wpm.toFixed(1) : "0.0"}
+                  </TableCell>
+                  <TableCell sx={{ color: theme.textColor, border: "none" }}>
+                    {test.accuracy ? test.accuracy.toFixed(1) + "%" : "0.0%"}
+                  </TableCell>
+                  <TableCell sx={{ color: theme.textColor, border: "none" }}>
+                    {test.date || "N/A"}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

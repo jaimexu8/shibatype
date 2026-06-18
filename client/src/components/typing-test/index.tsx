@@ -18,11 +18,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useTimer from "../../useTimer";
 import api from "../../services/api";
 import SettingsDialog from "./settings-dialog";
+import Skeleton from "../Skeleton";
+import { useDelayedSkeleton } from "../../hooks/useDelayedSkeleton";
 
 function TypingTest() {
   const [prompt, setPrompt] = useState(" ");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [flashColor, setFlashColor] = useState<string>("");
+  const [loadingPrompt, setLoadingPrompt] = useState(true);
+  const showSkeleton = useDelayedSkeleton(loadingPrompt);
 
   const [testStatus, setTestStatus] = useState(TestStatus.Idle);
   const { seconds, start, pause, reset } = useTimer();
@@ -56,18 +60,18 @@ function TypingTest() {
   useEffect(() => {
     async function fetchQuote() {
       try {
+        setLoadingPrompt(true);
         const res = await api.get("/api/test/prompt/", {
           params: { wordCount: settings.wordCount },
         });
         if (res.data && res.data.prompt && typeof res.data.prompt === 'string') {
           setPrompt(res.data.prompt);
+          setLoadingPrompt(false);
         } else {
           console.error("Invalid prompt received from server");
-          setPrompt("the quick brown fox jumps over the lazy dog");
         }
       } catch (error) {
         console.error(error);
-        setPrompt("the quick brown fox jumps over the lazy dog");
       }
     }
 
@@ -352,9 +356,21 @@ function TypingTest() {
           />
         </div>
       </div>
-      <div className="typing-test-text">
-        <TypedChars />
-        <UntypedChars />
+      <div className="typing-test-text w-full min-h-[8rem]">
+        {loadingPrompt ? (
+          showSkeleton ? (
+            <div className="flex flex-col gap-3 w-full">
+              <Skeleton height="2rem" width="100%" />
+              <Skeleton height="2rem" width="95%" />
+              <Skeleton height="2rem" width="90%" />
+            </div>
+          ) : null
+        ) : (
+          <>
+            <TypedChars />
+            <UntypedChars />
+          </>
+        )}
       </div>
       <div>
         <span>{seconds}s</span>

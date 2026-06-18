@@ -5,6 +5,8 @@ import { AccountViewType } from "../../constants/constants";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import UserTestsTable from "./user-tests-table";
+import Skeleton from "../Skeleton";
+import { useDelayedSkeleton } from "../../hooks/useDelayedSkeleton";
 
 interface Test {
   wpm: number;
@@ -23,6 +25,7 @@ export default function AccountView({ setAccountViewType }: AccountViewProps) {
   const { theme } = useTheme();
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
+  const showSkeleton = useDelayedSkeleton(loading);
 
   useEffect(() => {
     const fetchUserTests = async () => {
@@ -31,16 +34,15 @@ export default function AccountView({ setAccountViewType }: AccountViewProps) {
           const response = await api.get(`/api/test/user/${currentUser.uid}`);
           if (Array.isArray(response.data)) {
             setTests(response.data);
+            setLoading(false);
           } else {
             console.error("Invalid user tests response format:", response.data);
-            setTests([]);
           }
         } catch (error) {
           console.error("Error fetching user tests:", error);
-          setTests([]);
-        } finally {
-          setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
 
@@ -109,33 +111,40 @@ export default function AccountView({ setAccountViewType }: AccountViewProps) {
         <div className="flex justify-evenly w-full">
           <div>
             <p style={{ color: theme.secondaryColor }}>Tests Completed</p>
-            <p>{loading ? "Loading..." : totalTests}</p>
+            <div className="h-[24px]">{loading ? (showSkeleton ? <Skeleton width="50px" height="24px" /> : null) : totalTests}</div>
           </div>
           <div>
             <p style={{ color: theme.secondaryColor }}>Time Typed</p>
-            <p>{loading ? "Loading..." : formatTime(totalTimeTyped)}</p>
+            <div className="h-[24px]">{loading ? (showSkeleton ? <Skeleton width="50px" height="24px" /> : null) : formatTime(totalTimeTyped)}</div>
           </div>
           <div>
             <p style={{ color: theme.secondaryColor }}>Avg WPM</p>
-            <p>{loading ? "Loading..." : averageWpm.toFixed(1)}</p>
+            <div className="h-[24px]">{loading ? (showSkeleton ? <Skeleton width="50px" height="24px" /> : null) : averageWpm.toFixed(1)}</div>
           </div>
           <div>
             <p style={{ color: theme.secondaryColor }}>Avg Accuracy</p>
-            <p>{loading ? "Loading..." : averageAccuracy.toFixed(1)}%</p>
+            <div className="h-[24px]">{loading ? (showSkeleton ? <Skeleton width="50px" height="24px" /> : null) : `${averageAccuracy.toFixed(1)}%`}</div>
           </div>
         </div>
       </div>
 
-      {!loading && tests.length > 0 && (
+      {loading ? (
+        showSkeleton ? (
+          <div className="mt-6">
+            <h3 style={{ color: theme.textColor, marginBottom: "1rem" }}>
+              Test History
+            </h3>
+            <UserTestsTable tests={[]} loading={true} />
+          </div>
+        ) : null
+      ) : tests.length > 0 ? (
         <div className="mt-6">
           <h3 style={{ color: theme.textColor, marginBottom: "1rem" }}>
             Test History
           </h3>
-          <UserTestsTable tests={tests} />
+          <UserTestsTable tests={tests} loading={false} />
         </div>
-      )}
-
-      {!loading && tests.length === 0 && (
+      ) : (
         <div className="mt-6 text-center">
           <p style={{ color: theme.secondaryColor }}>
             No tests completed yet. Start typing to see your results here!

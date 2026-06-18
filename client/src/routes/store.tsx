@@ -13,6 +13,8 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Skeleton from "../components/Skeleton";
+import { useDelayedSkeleton } from "../hooks/useDelayedSkeleton";
 
 interface Theme {
   name: string;
@@ -30,6 +32,8 @@ export default function Store() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>();
   const [themes, setThemes] = useState<Theme[]>([]);
+  const [loadingThemes, setLoadingThemes] = useState(true);
+  const showSkeleton = useDelayedSkeleton(loadingThemes);
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,6 +46,7 @@ export default function Store() {
   useEffect(() => {
     async function fetchThemes() {
       try {
+        setLoadingThemes(true);
         const auth = getAuth();
         const currentUser = auth.currentUser;
 
@@ -67,6 +72,8 @@ export default function Store() {
         } else {
           setIsLoggedIn(false);
         }
+
+        setLoadingThemes(false);
       } catch (error) {
         console.error("Error fetching themes:", error);
       }
@@ -142,7 +149,31 @@ export default function Store() {
               marginTop: "16px",
             }}
           >
-            {themes.map((t, index) => {
+            {loadingThemes
+              ? showSkeleton ? Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={`skeleton-${index}`}
+                    style={{
+                      border: "1px solid #ccc",
+                      borderRadius: "8px",
+                      padding: "16px",
+                      backgroundColor: theme.backgroundColor,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      position: "relative",
+                    }}
+                  >
+                    <Skeleton height="1.5rem" width="60%" className="mb-3" />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <Skeleton width="30px" height="30px" borderRadius="4px" />
+                      <Skeleton width="30px" height="30px" borderRadius="4px" />
+                      <Skeleton width="30px" height="30px" borderRadius="4px" />
+                      <Skeleton width="30px" height="30px" borderRadius="4px" />
+                    </div>
+                  </div>
+                )) : null
+              : themes.map((t, index) => {
               const isUnlocked =
                 isLoggedIn && user?.themes && user.themes.includes(t.name);
               return (
